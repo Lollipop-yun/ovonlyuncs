@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>onlyun</title>
-    <!-- 引入 Dexie.js (用于 IndexedDB) 和图片压缩库 -->
+    <!-- 引入 Dexie.js (用于 IndexedDB)、官方导入导出插件和图片压缩库 -->
     <script src="https://unpkg.com/dexie@3/dist/dexie.js"></script>
+    <script src="https://unpkg.com/dexie-export-import@1.0.3/dist/dexie-export-import.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <style>
         :root {
@@ -2455,11 +2456,11 @@
                 </header>
                 <main class="settings-content">
                     <p style="font-size: 13px; color: var(--text-placeholder); margin-bottom: 20px; padding: 0 5px; line-height: 1.5;">
-                        您可以将应用内的所有数据（包括联系人、面具、聊天记录、API设置和主题）导出为单个文件进行备份，或从备份文件导入以恢复数据。
+                        您可以将应用内的所有数据（包括联系人、面具、聊天记录、API设置和主题等）导出为单个文件进行备份，或从备份文件导入以恢复数据。
                     </p>
                     <button id="export-data-btn" class="save-btn">导出数据</button>
                     <button id="import-data-btn" class="save-btn">导入数据</button>
-                    <input type="file" id="import-file-input" accept=".json" style="display: none;">
+                    <input type="file" id="import-file-input" accept=".json, .gz" style="display: none;">
                 </main>
             </div>
 
@@ -2878,108 +2879,106 @@
                     <button id="emoji-btn" class="action-btn">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14"/>
                             <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-                    <textarea id="message-input" placeholder="输入消息..." rows="1" disabled></textarea>
-                    <button id="generate-btn" class="action-btn" disabled></button>
+                    <textarea id="message-input" rows="1" placeholder="发送消息"></textarea>
                     <button id="send-btn" class="action-btn send-btn">发送</button>
+                    <button id="generate-btn" class="action-btn"></button>
                 </div>
                 <div id="multi-select-toolbar">
-                    <button id="multi-select-forward-btn" class="multi-select-btn" title="转发">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.186 2.25 2.25 0 0 0-3.933 2.186Z" /></svg>
-                    </button>
-                    <button id="multi-select-delete-btn" class="multi-select-btn" title="删除">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.067-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
-                    </button>
+                    <button id="multi-select-forward-btn" class="multi-select-btn" title="转发"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg></button>
+                    <button id="multi-select-delete-btn" class="multi-select-btn" title="删除"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg></button>
                 </div>
             </footer>
-            <footer class="wechat-tab-bar">
+            <nav class="wechat-tab-bar">
                 <div id="tab-messages" class="tab-item active">
-                    <svg viewBox="0 0 24 24"><path d="M21 11.5c0 4.47-4.03 8.11-9 8.11a9.76 9.76 0 0 1-2.55-.34C8.2 18.9 7 19.5 6 20c-1.5.75-3 1.5-3 1.5s.75-1.5 1.5-3c-.33-.55-.6-1.12-.8-1.7C3.25 15.93 3 14.76 3 13.5c0-4.47 4.03-8.11 9-8.11s9 3.64 9 8.11z" /></svg>
-                    <div>消息</div>
+                    <svg viewBox="0 0 24 24"><path d="M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z"></path></svg>
+                    <span>消息</span>
                 </div>
                 <div id="tab-contacts" class="tab-item">
-                    <svg viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><path d="M9 3a4 4 0 0 1 0 8a4 4 0 0 1 0-8z" /><path d="M23 20v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-                    <div>通讯录</div>
+                    <svg viewBox="0 0 24 24"><path d="M12,12c2.2,0,4-1.8,4-4s-1.8-4-4-4S8,5.8,8,8S9.8,12,12,12z M12,14c-2.7,0-8,1.3-8,4v2h16v-2C20,15.3,14.7,14,12,14z"></path></svg>
+                    <span>通讯录</span>
                 </div>
-                <div id="tab-discover" class="tab-item">
-                    <div class="unread-dot"></div>
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="m14.31 8l5.74 9.94M9.69 8h11.48M7.78 16.5l-2.83-5.94M14.31 16H2.83m13.79-4l-5.74-9.94" /></svg>
-                    <div>发现</div>
+                <div id="tab-discover" class="tab-item disabled-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"></polygon></svg>
+                    <span>发现</span>
                 </div>
                 <div id="tab-me" class="tab-item">
-                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-                    <div>我</div>
+                    <svg viewBox="0 0 24 24"><path d="M12,12c2.2,0,4-1.8,4-4s-1.8-4-4-4S8,5.8,8,8S9.8,12,12,12z M12,14c-2.7,0-8,1.3-8,4v2h16v-2C20,15.3,14.7,14,12,14z"></path></svg>
+                    <span>我</span>
                 </div>
-            </footer>
-            <div class="home-indicator-container"><div class="home-indicator"></div></div>
+            </nav>
         </div>
 
-        <div id="custom-modal-overlay" class="custom-modal-overlay">
-            <div class="custom-modal-box">
-                <div id="custom-modal-content" class="custom-modal-content">
-                    <h3 id="custom-modal-title"></h3>
-                    <div id="custom-modal-message"></div>
-                </div>
-                <div id="custom-modal-buttons" class="custom-modal-buttons">
-                </div>
-            </div>
-        </div>
         <div id="main-add-menu-overlay"></div>
         <ul id="main-add-menu">
             <li id="menu-start-new-chat">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.72.372a3.75 3.75 0 0 1-3.653-3.653V12a3.75 3.75 0 0 1 3.75-3.75h5.052Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12.25 3.75a3.75 3.75 0 0 0-3.75 3.75v3.75h3.75V3.75Zm-3.75 0h-3.75a3.75 3.75 0 0 0-3.75 3.75v9.75c0 1.01.621 1.874 1.5 2.193l3.72.372a3.75 3.75 0 0 0 3.653-3.653V7.5h-1.5V3.75Z" /></svg>
-                <span>发起新聊天</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" /></svg>
+                发起新聊天
             </li>
             <li id="menu-create-group">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.962c.57-.063 1.14-.094 1.72-.094s1.15.031 1.72.094m-1.72-.094a3 3 0 0 0-5.72 0m5.72 0a3 3 0 0 1 5.72 0m0 0a3 3 0 0 1-5.72 0M3 16.065a9.094 9.094 0 0 1 3.741-.479 3 3 0 0 1 4.682-2.72m-7.5 2.962a3 3 0 0 0 5.72 0m-5.72 0a3 3 0 0 1 5.72 0m0 0a3 3 0 0 1-5.72 0M12 6.75a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm-3.375 0a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0Z" /></svg>
-                <span>创建群聊</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.226A3 3 0 0 1 15 15l-1.076 1.076a3 3 0 0 1-4.242 0l-2.122-2.122a3 3 0 0 1 0-4.242l1.076-1.076A3 3 0 0 1 10.5 7.5m-5 5a4.5 4.5 0 0 1 0-6.364A4.5 4.5 0 0 1 12 6.136m-1.071 4.545A4.5 4.5 0 0 0 12 17.864a4.5 4.5 0 0 0 6.364-6.364m-1.071 4.545L12 17.864" /></svg>
+                创建群聊
             </li>
         </ul>
-        <div id="forward-contact-picker-modal">
-            <div class="forward-picker-box">
-                <div class="forward-picker-header">选择一个联系人</div>
-                <div class="forward-picker-list"></div>
-            </div>
-        </div>
+
         <div id="ai-status-modal">
             <div class="ai-status-box">
-                <h3>AI状态</h3>
-                <h4>此刻的想法</h4>
+                <h3>AI 状态</h3>
+                <h4>内心想法</h4>
                 <p id="ai-status-thoughts">(暂无)</p>
-                <h4>此刻的动作</h4>
+                <h4>细微动作</h4>
                 <p id="ai-status-action">(暂无)</p>
-                <h4>此刻的穿着</h4>
+                <h4>当前衣着</h4>
                 <p id="ai-status-clothing">(暂无)</p>
-                <h4>此刻的位置</h4>
+                <h4>当前地点</h4>
                 <p id="ai-status-location">(暂无)</p>
             </div>
         </div>
-    </div>
+        
+        <div id="custom-modal-overlay" class="custom-modal-overlay">
+            <div class="custom-modal-box">
+                <div class="custom-modal-content">
+                    <h3 id="modal-title" class="custom-modal-title"></h3>
+                    <div id="modal-message" class="custom-modal-message"></div>
+                </div>
+                <div id="modal-buttons" class="custom-modal-buttons"></div>
+            </div>
+        </div>
 
+        <div id="forward-contact-picker-modal">
+            <div class="forward-picker-box">
+                <div class="forward-picker-header">转发给</div>
+                <div id="forward-picker-list" class="forward-picker-list"></div>
+            </div>
+        </div>
+
+        <div class="home-indicator-container">
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const db = new Dexie('WeChatDB');
-            
+            const db = new Dexie("onlyunApp");
             db.version(24).stores({
-                contacts: '++id, &contactId, name, type, members, remark, isPinned, isTimeSensingEnabled, lastMessageTimestamp, lastMessageContent, boundMaskId, *boundWorldBookFolders, chatBackground, lastAiThoughts, lastAiAction, lastAiClothing, lastAiLocation, walletBalance, chatSpecificAvatars',
-                chatHistories: '&contactId, messages',
-                settings: '&key, data',
-                masks: '++id, &maskId, name, story, gender, avatar',
-                widgetData: '&key, value',
-                favorites: '++id, &favId, messageId, contactId, timestamp',
-                worldBook: '++id, type, name, folderId, content',
-                userProfile: '&key, value',
-                transactions: '++id, timestamp, type, contactId'
+                contacts: '++id, &contactId, type, isPinned, lastMessageTimestamp',
+                masks: '++id, &maskId',
+                chatHistories: '&contactId',
+                settings: '&key',
+                widgetData: '&key',
+                favorites: '&favId, contactId, timestamp',
+                worldBook: '++id, type, folderId, name',
+                userProfile: '&key',
+                transactions: '++id, timestamp, owner'
             });
 
-            // Element Selectors
+            // DOM Elements
             const body = document.body;
             const homeScreen = document.getElementById('home-screen');
-            const appContainer = document.getElementById('app-container');
             const reopenAppIcon = document.getElementById('reopen-app-icon');
             const apiSettingsIcon = document.getElementById('api-settings-icon');
             const themeIcon = document.getElementById('theme-icon');
@@ -2990,118 +2989,7 @@
             const batteryLevel = document.getElementById('battery-level');
             const widgetTime = document.getElementById('widget-time');
             const widgetDate = document.getElementById('widget-date');
-
-            const wechatChatList = document.querySelector('.wechat-chat-list');
-            const messageInput = document.getElementById('message-input');
-            const sendBtn = document.getElementById('send-btn');
-            const generateBtn = document.getElementById('generate-btn');
-            const chatMessages = document.getElementById('chat-messages');
-            const chatHeaderTitle = document.getElementById('chat-header-title');
-            
-            const tabMessages = document.getElementById('tab-messages');
-            const tabContacts = document.getElementById('tab-contacts');
-            const tabMe = document.getElementById('tab-me');
-            
-            const backToMainBtn = document.getElementById('back-to-main-btn');
-            const backToListBtn = document.getElementById('back-to-list-btn');
-            const toSettingsBtn = document.getElementById('to-settings-btn');
-            const backToChatBtn = document.getElementById('back-to-chat-btn');
-            
-            const contactsList = document.getElementById('contacts-list');
-            const addNewContactBtn = document.getElementById('add-new-contact-btn');
-
-            const editContactTitle = document.getElementById('edit-contact-title');
-            const cancelEditContactBtn = document.getElementById('cancel-edit-contact-btn');
-            const saveContactBtn = document.getElementById('save-contact-btn');
-            const contactNameInput = document.getElementById('contact-name-input');
-            const contactGenderSelect = document.getElementById('contact-gender-select');
-            const contactStoryTextarea = document.getElementById('contact-story-textarea');
-            const contactAvatarInput = document.getElementById('contact-avatar-input');
-            
-            const chatSettingsAvatar = document.getElementById('chat-settings-avatar');
-            const chatSettingsName = document.getElementById('chat-settings-name');
-            const pinChatToggle = document.getElementById('pin-chat-toggle');
-            const timeSensingToggle = document.getElementById('time-sensing-toggle');
-            const setChatBackgroundBtn = document.getElementById('set-chat-background-btn');
-            const chatBgInput = document.getElementById('chat-bg-input');
-            const setRemarkBtn = document.getElementById('set-remark-btn');
-            const editContactInfoBtn = document.getElementById('edit-contact-info-btn');
-            const clearHistoryBtn = document.getElementById('clear-history-btn');
-            const deleteContactBtn = document.getElementById('delete-contact-btn');
-
-            const toast = document.getElementById('toast-notification');
             const dynamicIsland = document.getElementById('dynamic-island');
-            
-            const modalOverlay = document.getElementById('custom-modal-overlay');
-            const modalContent = document.getElementById('custom-modal-content');
-            const modalTitle = document.getElementById('custom-modal-title');
-            const modalMessage = document.getElementById('custom-modal-message');
-            const modalButtons = document.getElementById('custom-modal-buttons');
-
-            const baseUrlInput = document.getElementById('base-url');
-            const apiKeyInput = document.getElementById('api-key');
-            const modelSelect = document.getElementById('model-select');
-            const fetchModelsBtn = document.getElementById('fetch-models-btn');
-            const saveApiSettingsBtn = document.getElementById('save-api-settings-btn');
-            const presetSelect = document.getElementById('preset-select');
-            const savePresetBtn = document.getElementById('save-preset-btn');
-            const deletePresetBtn = document.getElementById('delete-preset-btn');
-            
-            const mainSettingsModal = document.getElementById('main-settings-modal');
-            const themeSettingsModal = document.getElementById('theme-settings-modal');
-            const closeMainSettingsBtn = document.getElementById('close-main-settings-btn');
-            const closeThemeSettingsBtn = document.getElementById('close-theme-settings-btn');
-            const goToApiConfigBtn = document.getElementById('go-to-api-config-btn');
-            const goToDataManagementBtn = document.getElementById('go-to-data-management-btn');
-            const backToMainSettingsBtn = document.getElementById('back-to-main-settings-btn');
-            const backToMainSettingsFromApiBtn = document.getElementById('back-to-main-settings-from-api-btn');
-            
-            const exportDataBtn = document.getElementById('export-data-btn');
-            const importDataBtn = document.getElementById('import-data-btn');
-            const importFileInput = document.getElementById('import-file-input');
-
-            const wallpaperInput = document.getElementById('wallpaper-input');
-            const resetWallpaperBtn = document.getElementById('reset-wallpaper-btn');
-            const togglePhoneFrame = document.getElementById('toggle-phone-frame');
-            const iconSettingsList = document.getElementById('icon-settings-list');
-            const iconUploadInput = document.getElementById('icon-upload-input');
-
-            const mePage = document.getElementById('me-page');
-            const meAvatar = document.getElementById('me-avatar');
-            const meName = document.getElementById('me-name');
-            const meAvatarInput = document.getElementById('me-avatar-input');
-            const meWalletBtn = document.getElementById('me-wallet-btn');
-            const meMomentsBtn = document.getElementById('me-moments-btn');
-            const meStickersBtn = document.getElementById('me-stickers-btn');
-            const meMasksBtn = document.getElementById('me-masks-btn');
-            const meFavoritesBtn = document.getElementById('me-favorites-btn');
-
-            const masksList = document.getElementById('masks-list');
-            const addMaskBtn = document.getElementById('add-mask-btn');
-            const backToMeBtn = document.getElementById('back-to-me-btn');
-            
-            const editMaskTitle = document.getElementById('edit-mask-title');
-            const maskAvatarUploader = document.querySelector('#edit-mask-page .avatar-uploader');
-            const maskAvatarInput = document.getElementById('mask-avatar-input');
-            const maskAvatarPreview = document.getElementById('mask-avatar-preview');
-            const maskNameInput = document.getElementById('mask-name-input');
-            const maskGenderSelect = document.getElementById('mask-gender-select');
-            const maskStoryTextarea = document.getElementById('mask-story-textarea');
-            const saveMaskBtn = document.getElementById('save-mask-btn');
-            const cancelEditMaskBtn = document.getElementById('cancel-edit-mask-btn');
-            const deleteMaskBtn = document.getElementById('delete-mask-btn');
-
-            const bindMaskBtn = document.getElementById('bind-mask-btn');
-            const boundMaskName = document.getElementById('bound-mask-name');
-            const maskSelectionList = document.getElementById('mask-selection-list');
-            const backToChatSettingsBtn = document.getElementById('back-to-chat-settings-btn');
-            
-            const favoritesList = document.getElementById('favorites-list');
-            const backToMeFromFavoritesBtn = document.getElementById('back-to-me-from-favorites-btn');
-            
-            const moreActionsBtn = document.getElementById('more-actions-btn');
-            const emojiBtn = document.getElementById('emoji-btn');
-            const moreActionsPanel = document.getElementById('more-actions-panel');
             
             const photoWidget = document.getElementById('photo-widget');
             const photoWidgetInput = document.getElementById('photo-widget-input');
@@ -3112,39 +3000,147 @@
             const customImageTextWidget = document.getElementById('custom-image-text-widget');
             const widgetCircularUpload = document.getElementById('widget-circular-upload');
             const widgetCircularUploadInput = document.getElementById('widget-circular-upload-input');
-            const widgetBackgroundInput = document.getElementById('widget-background-input');
             const widgetTextTop = document.getElementById('widget-text-top');
             const widgetTextBottom = document.getElementById('widget-text-bottom');
+            const widgetBackgroundInput = document.getElementById('widget-background-input');
 
+            const wechatChatList = document.querySelector('.wechat-chat-list');
+            const tabMessages = document.getElementById('tab-messages');
+            const tabContacts = document.getElementById('tab-contacts');
+            const tabMe = document.getElementById('tab-me');
+            
+            const backToMainBtn = document.getElementById('back-to-main-btn');
+            const contactsList = document.getElementById('contacts-list');
+            const addNewContactBtn = document.getElementById('add-new-contact-btn');
+            
+            const backToListBtn = document.getElementById('back-to-list-btn');
+            const chatHeaderTitle = document.getElementById('chat-header-title');
+            const chatMessages = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            const generateBtn = document.getElementById('generate-btn');
+            const moreActionsBtn = document.getElementById('more-actions-btn');
+            const emojiBtn = document.getElementById('emoji-btn');
+            const moreActionsPanel = document.getElementById('more-actions-panel');
+            
+            const toSettingsBtn = document.getElementById('to-settings-btn');
+            const backToChatBtn = document.getElementById('back-to-chat-btn');
+            const chatSettingsAvatar = document.getElementById('chat-settings-avatar');
+            const chatSettingsName = document.getElementById('chat-settings-name');
+            const pinChatToggle = document.getElementById('pin-chat-toggle');
+            const timeSensingToggle = document.getElementById('time-sensing-toggle');
+            const setChatBackgroundBtn = document.getElementById('set-chat-background-btn');
+            const chatBgInput = document.getElementById('chat-bg-input');
+            const setRemarkBtn = document.getElementById('set-remark-btn');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            const deleteContactBtn = document.getElementById('delete-contact-btn');
+            const editContactInfoBtn = document.getElementById('edit-contact-info-btn');
+            const bindMaskBtn = document.getElementById('bind-mask-btn');
+            const boundMaskName = document.getElementById('bound-mask-name');
+            const bindWorldbookBtn = document.getElementById('bind-worldbook-btn');
+            const boundWorldbookValue = document.getElementById('bound-worldbook-value');
+
+            const cancelEditContactBtn = document.getElementById('cancel-edit-contact-btn');
+            const saveContactBtn = document.getElementById('save-contact-btn');
+            const editContactTitle = document.getElementById('edit-contact-title');
+            const contactNameInput = document.getElementById('contact-name-input');
+            const contactGenderSelect = document.getElementById('contact-gender-select');
+            const contactStoryTextarea = document.getElementById('contact-story-textarea');
+            const contactAvatarInput = document.getElementById('contact-avatar-input');
+            
+            const toast = document.getElementById('toast-notification');
+            
+            const modalOverlay = document.getElementById('custom-modal-overlay');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const modalButtons = document.getElementById('modal-buttons');
+
+            const mainSettingsModal = document.getElementById('main-settings-modal');
+            const closeMainSettingsBtn = document.getElementById('close-main-settings-btn');
+            const goToApiConfigBtn = document.getElementById('go-to-api-config-btn');
+            const goToDataManagementBtn = document.getElementById('go-to-data-management-btn');
+            const backToMainSettingsBtn = document.getElementById('back-to-main-settings-btn');
+            const togglePhoneFrame = document.getElementById('toggle-phone-frame');
+            
+            const themeSettingsModal = document.getElementById('theme-settings-modal');
+            const closeThemeSettingsBtn = document.getElementById('close-theme-settings-btn');
+            const wallpaperInput = document.getElementById('wallpaper-input');
+            const resetWallpaperBtn = document.getElementById('reset-wallpaper-btn');
+            const iconSettingsList = document.getElementById('icon-settings-list');
+            const iconUploadInput = document.getElementById('icon-upload-input');
+            
+            const backToMainSettingsFromApiBtn = document.getElementById('back-to-main-settings-from-api-btn');
+            const baseUrlInput = document.getElementById('base-url');
+            const apiKeyInput = document.getElementById('api-key');
+            const modelSelect = document.getElementById('model-select');
+            const fetchModelsBtn = document.getElementById('fetch-models-btn');
+            const saveApiSettingsBtn = document.getElementById('save-api-settings-btn');
+            const presetSelect = document.getElementById('preset-select');
+            const savePresetBtn = document.getElementById('save-preset-btn');
+            const deletePresetBtn = document.getElementById('delete-preset-btn');
+            
+            const exportDataBtn = document.getElementById('export-data-btn');
+            const importDataBtn = document.getElementById('import-data-btn');
+            const importFileInput = document.getElementById('import-file-input');
+            
+            const mePage = document.getElementById('me-page');
+            const meAvatar = document.getElementById('me-avatar');
+            const meAvatarInput = document.getElementById('me-avatar-input');
+            const meName = document.getElementById('me-name');
+            const meMomentsBtn = document.getElementById('me-moments-btn');
+            const meStickersBtn = document.getElementById('me-stickers-btn');
+            const meMasksBtn = document.getElementById('me-masks-btn');
+            const meFavoritesBtn = document.getElementById('me-favorites-btn');
+
+            const backToMeBtn = document.getElementById('back-to-me-btn');
+            const backToChatSettingsBtn = document.getElementById('back-to-chat-settings-btn');
+            const masksList = document.getElementById('masks-list');
+            const addMaskBtn = document.getElementById('add-mask-btn');
+            
+            const editMaskTitle = document.getElementById('edit-mask-title');
+            const cancelEditMaskBtn = document.getElementById('cancel-edit-mask-btn');
+            const saveMaskBtn = document.getElementById('save-mask-btn');
+            const deleteMaskBtn = document.getElementById('delete-mask-btn');
+            const maskAvatarUploader = document.querySelector('#edit-mask-page .avatar-uploader');
+            const maskAvatarInput = document.getElementById('mask-avatar-input');
+            const maskAvatarPreview = document.getElementById('mask-avatar-preview');
+            const maskNameInput = document.getElementById('mask-name-input');
+            const maskGenderSelect = document.getElementById('mask-gender-select');
+            const maskStoryTextarea = document.getElementById('mask-story-textarea');
+
+            const maskSelectionList = document.getElementById('mask-selection-list');
+            
+            const backToMeFromFavoritesBtn = document.getElementById('back-to-me-from-favorites-btn');
+            const favoritesList = document.getElementById('favorites-list');
+            
             const multiSelectToolbar = document.getElementById('multi-select-toolbar');
             const multiSelectDeleteBtn = document.getElementById('multi-select-delete-btn');
             const multiSelectForwardBtn = document.getElementById('multi-select-forward-btn');
             const cancelMultiSelectBtn = document.getElementById('cancel-multi-select-btn');
+            
             const forwardContactPickerModal = document.getElementById('forward-contact-picker-modal');
-            const forwardPickerList = document.querySelector('#forward-contact-picker-modal .forward-picker-list');
+            const forwardPickerList = document.getElementById('forward-picker-list');
+            
+            const mainAddMenuOverlay = document.getElementById('main-add-menu-overlay');
+            const mainAddMenu = document.getElementById('main-add-menu');
+            const mainAddBtn = document.getElementById('main-add-btn');
+            const menuStartNewChat = document.getElementById('menu-start-new-chat');
+            const menuCreateGroup = document.getElementById('menu-create-group');
             
             const replyPreviewBar = document.getElementById('reply-preview-bar');
             const replyPreviewContent = document.querySelector('.reply-preview-content');
             const closeReplyBtn = document.getElementById('close-reply-btn');
             
-            const mainAddBtn = document.getElementById('main-add-btn');
-            const mainAddMenuOverlay = document.getElementById('main-add-menu-overlay');
-            const mainAddMenu = document.getElementById('main-add-menu');
-            const menuStartNewChat = document.getElementById('menu-start-new-chat');
-            const menuCreateGroup = document.getElementById('menu-create-group');
-            
             const backFromWorldbookBtn = document.getElementById('back-from-worldbook-btn');
+            const worldbookListContainer = document.getElementById('worldbook-list-container');
             const wbCreateFolderBtn = document.getElementById('wb-create-folder-btn');
             const wbCreateFileBtn = document.getElementById('wb-create-file-btn');
-            const worldbookListContainer = document.getElementById('worldbook-list-container');
             const wbEditTitle = document.getElementById('wb-edit-title');
             const wbEditNameInput = document.getElementById('wb-edit-name');
-            const wbEditContentTextarea = document.getElementById('wb-edit-content');
             const wbEditFolderSelect = document.getElementById('wb-edit-folder');
-            const wbEditSaveBtn = document.getElementById('wb-edit-save-btn');
+            const wbEditContentTextarea = document.getElementById('wb-edit-content');
             const wbEditCancelBtn = document.getElementById('wb-edit-cancel-btn');
-            const bindWorldbookBtn = document.getElementById('bind-worldbook-btn');
-            const boundWorldbookValue = document.getElementById('bound-worldbook-value');
+            const wbEditSaveBtn = document.getElementById('wb-edit-save-btn');
             const worldbookBindingList = document.getElementById('worldbook-binding-list');
             const backToChatSettingsFromWBBindingBtn = document.getElementById('back-to-chat-settings-from-wb-binding-btn');
 
@@ -3154,8 +3150,10 @@
             const aiStatusClothing = document.getElementById('ai-status-clothing');
             const aiStatusLocation = document.getElementById('ai-status-location');
             
+            const meWalletBtn = document.getElementById('me-wallet-btn');
             const backToMeFromWalletBtn = document.getElementById('back-to-me-from-wallet-btn');
             const walletBalanceAmount = document.getElementById('wallet-balance-amount');
+            const walletTopupBtn = document.getElementById('wallet-topup-btn');
             const walletWithdrawBtn = document.getElementById('wallet-withdraw-btn');
             const walletDetailsBtn = document.getElementById('wallet-details-btn');
             const backToWalletBtn = document.getElementById('back-to-wallet-btn');
@@ -3556,7 +3554,7 @@
                     }
 
                     let previewHTML = contact.lastMessageContent || '';
-                    previewHTML = previewHTML.replace(/\[(红包|转账|语音|图片|聊天记录|代码片段|相册)\]/g, '[$1] ');
+                    previewHTML = previewHTML.replace(/$$(红包|转账|语音|图片|聊天记录|代码片段|相册)$$/g, '[\$1] ');
 
                     item.innerHTML = `
                         ${avatarHTML}
@@ -3612,7 +3610,7 @@
                             avatarHTML = generateTextAvatar(displayName, contact.contactId).replace('class="avatar"', 'class="contact-avatar avatar"');
                         }
 
-                        item.innerHTML = `
+                        item.innerHTML =`
                             ${avatarHTML}
                             <div class="contact-name">${displayName}</div>
                         `;
@@ -4320,13 +4318,13 @@
                     aiStatusClothing.textContent = clothing;
                     aiStatusLocation.textContent = location;
 
-                    if (/$$RECALL$$/.test(replyText)) {
-                        replyText = replyText.replace(/$$RECALL$$\s*/g, '');
+                    if (/\[RECALL\]/.test(replyText)) {
+                        replyText = replyText.replace(/\[RECALL\]\s*/g, '');
                         await recallLastAiMessage();
                     }
 
-                    if (/$$REFUND_TRANSFER$$/.test(replyText)) {
-                        replyText = replyText.replace(/$$REFUND_TRANSFER$$\s*/g, '');
+                    if (/\[REFUND_TRANSFER\]/.test(replyText)) {
+                        replyText = replyText.replace(/\[REFUND_TRANSFER\]\s*/g, '');
                         const fullHistory = await loadChatHistory(contact.contactId);
                         let refunded = false;
                         for (let i = fullHistory.length - 1; i >= 0; i--) {
@@ -4344,7 +4342,7 @@
                         }
                     }
 
-                    const quoteRegex = /$$QUOTE:(.*?)$$/s;
+                    const quoteRegex = /\[QUOTE:(.*?)\]/s;
                     let aiQuoteContent = null;
                     const quoteMatch = replyText.match(quoteRegex);
                     if (quoteMatch) {
@@ -4352,7 +4350,7 @@
                         replyText = replyText.replace(quoteRegex, '').trim();
                     }
                     
-                    const combinedRegex = /($$VOICE:(.*?)$$)|($$RED_PACKET:([^,$$]+),([^,\]]*)\])|($$TRANSFER:([^,$$]+),([^,\]]*)\])|($$IMAGE:(.*?)$$)|($$HTML:([\s\S]*?)$$)/g;
+                    const combinedRegex = /(\[VOICE:(.*?)\])|(\[RED_PACKET:([^,\]]+),([^,\]]*)\])|(\[TRANSFER:([^,\]]+),([^,\]]*)\])|(\[IMAGE:(.*?)\])|(\[HTML:([\s\S]*?)\])/g;
 
                     let lastIndex = 0;
                     const processQueue = [];
@@ -4547,8 +4545,9 @@
             
             const showCustomModal = (options) => {
                 return new Promise((resolve) => {
+                    const modalContent = modalMessage;
                     modalTitle.textContent = options.title || '';
-                    modalContent.className = 'custom-modal-content';
+                    modalContent.className = 'custom-modal-message';
                     
                     if (options.isFinancial) {
                         modalContent.classList.add('financial-modal-body');
@@ -4964,31 +4963,12 @@
             const exportAllData = async () => {
                 try {
                     showToast('正在准备数据...');
-                    const [contacts, masks, chatHistories, settings, widgetData, favorites, worldBook, userProfile, transactions] = await Promise.all([
-                        db.contacts.toArray(),
-                        db.masks.toArray(),
-                        db.chatHistories.toArray(),
-                        db.settings.toArray(),
-                        db.widgetData.toArray(),
-                        db.favorites.toArray(),
-                        db.worldBook.toArray(),
-                        db.userProfile.toArray(),
-                        db.transactions.toArray()
-                    ]);
-                    const localStorageData = {
-                        showPhoneFrame: localStorage.getItem('showPhoneFrame')
-                    };
-                    const backupData = {
-                        dbVersion: 24,
-                        contacts, masks, chatHistories, settings, widgetData, favorites, worldBook, userProfile, transactions, localStorageData
-                    };
-                    const jsonString = JSON.stringify(backupData, null, 2);
-                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const blob = await db.export({ prettyJson: true });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     const today = new Date().toISOString().slice(0, 10);
                     a.href = url;
-                    a.download = `wechat_backup_${today}.json`;
+                    a.download = `onlyun_backup_${today}.json`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -4996,7 +4976,7 @@
                     showToast('数据已成功导出！');
                 } catch (error) {
                     console.error('Export failed:', error);
-                    showToast('数据导出失败！', 'warning');
+                    showToast(`数据导出失败: ${error.message}`, 'warning');
                 }
             };
 
@@ -5004,36 +4984,18 @@
                 const reader = new FileReader();
                 reader.onload = async (event) => {
                     try {
-                        const backupData = JSON.parse(event.target.result);
-                        if (!backupData.contacts || !backupData.masks || !backupData.chatHistories || !backupData.settings) {
-                            throw new Error('备份文件格式无效或已损坏。');
-                        }
+                        const blob = new Blob([event.target.result], { type: 'application/json' });
                         const { action } = await showCustomModal({
                             title: '导入确认',
-                            message: '导入将覆盖当前所有数据，此操作不可撤销。确定要继续吗？',
+                            message: '导入将【覆盖】当前所有数据，此操作不可撤销。确定要继续吗？',
                              buttons: [ {id: 'cancel', text: '取消'}, {id: 'confirm', text: '确认导入', class: 'destructive'}],
                              buttonLayout: 'row'
                         });
                         if (action === 'confirm') {
                             showToast('正在导入数据，请稍候...');
-                            const tablesToClear = [db.contacts, db.masks, db.chatHistories, db.settings, db.widgetData, db.favorites, db.worldBook, db.userProfile, db.transactions];
-
-                            await db.transaction('rw', ...tablesToClear, async () => {
-                                await Promise.all(tablesToClear.map(table => table.clear()));
-                                localStorage.clear();
-                                if(backupData.contacts) await db.contacts.bulkPut(backupData.contacts);
-                                if(backupData.masks) await db.masks.bulkPut(backupData.masks);
-                                if(backupData.chatHistories) await db.chatHistories.bulkPut(backupData.chatHistories);
-                                if(backupData.settings) await db.settings.bulkPut(backupData.settings);
-                                if(backupData.widgetData) await db.widgetData.bulkPut(backupData.widgetData);
-                                if(backupData.favorites) await db.favorites.bulkPut(backupData.favorites);
-                                if(backupData.worldBook) await db.worldBook.bulkPut(backupData.worldBook);
-                                if(backupData.userProfile) await db.userProfile.bulkPut(backupData.userProfile);
-                                if(backupData.transactions) await db.transactions.bulkPut(backupData.transactions);
-                               
-                                if (backupData.localStorageData) {
-                                    if (backupData.localStorageData.showPhoneFrame) localStorage.setItem('showPhoneFrame', backupData.localStorageData.showPhoneFrame);
-                                }
+                            await db.import(blob, {
+                                overwriteValues: true,
+                                clearTablesBeforeImport: true
                             });
                             showToast('数据导入成功！应用即将刷新。');
                             setTimeout(() => location.reload(), 2000);
@@ -5043,7 +5005,7 @@
                         showToast(`导入失败: ${error.message}`, 'warning');
                     }
                 };
-                reader.readAsText(file);
+                reader.readAsArrayBuffer(file);
             };
 
             const appIconsToCustomize = [
@@ -5340,8 +5302,7 @@
             };
 
             const showNewChatPicker = async () => {
-                const singleContacts = allContacts.filter(c => c.type === 'single');
-                const contactsWithoutHistory = singleContacts.filter(c => !c.lastMessageTimestamp);
+                const contactsWithoutHistory = allContacts.filter(c => c.type === 'single' && !c.lastMessageTimestamp);
 
                 if (contactsWithoutHistory.length === 0) {
                     showToast('所有联系人都在聊天列表中了', 'info');
@@ -5392,7 +5353,7 @@
 
             menuCreateGroup.addEventListener('click', () => {
                 toggleMainMenu();
-                showGroupChatCreator();
+                showToast('群聊功能暂未开放。');
             });
 
             const setupAvatarUpload = (uploaderEl, inputEl, previewEl) => {
@@ -5978,83 +5939,6 @@
                     location.reload();
                 }, 1500);
             });
-
-            async function showGroupChatCreator() {
-                const singleContacts = allContacts.filter(c => c.type === 'single');
-
-                if (singleContacts.length < 1) {
-                    showToast('至少需要1个AI联系人才能创建群聊', 'warning');
-                    return;
-                }
-                
-                const contactListHTML = singleContacts.map(contact => {
-                    let avatarHTML;
-                    if(contact.avatar) {
-                        avatarHTML = `<div class="contact-avatar" style="background-image: url(${contact.avatar})"></div>`;
-                    } else {
-                        avatarHTML = generateTextAvatar(getDisplayName(contact), contact.contactId).replace('class="avatar"', 'class="contact-avatar avatar"');
-                    }
-
-                    return `
-                    <div class="picker-contact-item">
-                        <label>
-                            <input type="checkbox" name="members" value="${contact.contactId}">
-                            ${avatarHTML}
-                            ${getDisplayName(contact)}
-                        </label>
-                    </div>`
-                }).join('');
-
-                const modalHtml = `
-                    <div class="settings-group" style="margin-bottom: 10px;">
-                        <div class="form-group">
-                            <input type="text" name="groupName" placeholder="起个群名吧">
-                        </div>
-                    </div>
-                    <p style="font-size:13px; color: #888; text-align: left; padding: 0 5px 10px;">选择群成员</p>
-                    <div class="modal-contact-picker-list">
-                        ${contactListHTML}
-                    </div>
-                `;
-
-                const { action, values } = await showCustomModal({
-                    title: '创建群聊',
-                    isGroupCreation: true,
-                    rawHTML: modalHtml,
-                    buttons: [{id: 'cancel', text: '取消'}, {id: 'confirm', text: '创建', class: 'confirm'}],
-                    buttonLayout: 'row'
-                });
-
-                if (action === 'confirm') {
-                    const groupName = values.groupName ? values.groupName.trim() : '';
-                    const members = values.members || [];
-
-                    if (!groupName) {
-                        showToast('群聊名称不能为空', 'warning');
-                        return;
-                    }
-                    if (members.length < 1) { 
-                        showToast('至少需要选择1名成员', 'warning');
-                        return;
-                    }
-
-                    const newGroup = {
-                        name: groupName,
-                        type: 'group',
-                        members: members,
-                        contactId: `group_${Date.now()}`,
-                        isPinned: false,
-                        lastMessageTimestamp: Date.now(),
-                        lastMessageContent: '你创建了群聊',
-                        chatSpecificAvatars: {},
-                    };
-
-                    await db.contacts.add(newGroup);
-                    showToast('群聊创建成功');
-                    await loadAllContacts();
-                    await renderMainChatList();
-                }
-            }
 
             function enterMultiSelectMode(initialBubbleElement) {
                 isMultiSelectMode = true;
@@ -6926,25 +6810,17 @@
                             <input type="file" accept="image/*" style="display: none;">
                         </div>
                     </div>
-                    <div style="padding: 0 20px 20px;">
-                        <button id="modal-reset-avatars" class="save-btn reset-btn" style="width: 100%; margin-top: 10px;">恢复默认头像</button>
-                    </div>
+                    <button id="modal-reset-avatars" class="save-btn reset-btn" style="margin: 20px 0 0;">恢复默认头像</button>
                 `;
 
                 const { action } = await showCustomModal({
                     title: '更换聊天头像',
                     rawHTML: modalHtml,
-                    buttons: [{id: 'close', text: '关闭', class: 'confirm'}]
+                    buttons: [{id: 'close', text: '完成', class: 'confirm'}]
                 });
-
-                if (action === 'close') {
-                    await renderChatSettingsPage();
-                    await renderChatMessages(currentChatContactId);
-                    await renderMainChatList();
-                }
             });
-            
-            modalOverlay.addEventListener('click',e => {
+
+            modalOverlay.addEventListener('click', e => {
                 const uploader = e.target.closest('.avatar-uploader');
                 if (uploader) {
                     uploader.querySelector('input[type="file"]').click();
@@ -6957,7 +6833,6 @@
                         const userPreview = modalOverlay.querySelector('.avatar-uploader[data-target="user"] .avatar-preview');
                         const assistantPreview = modalOverlay.querySelector('.avatar-uploader[data-target="assistant"] .avatar-preview');
                         
-                        // We need to fetch the default avatars to reset the preview correctly
                         (async () => {
                             const contact = await db.contacts.get({contactId: currentChatContactId});
                             let myAvatarPreview = '';
