@@ -213,7 +213,6 @@
         #theme-icon::after { content: '主题'; }
         #forum-app-icon::after { content: '论坛'; }
         #worldbook-app-icon::after { content: '世界书'; }
-        /* ★★★ UI/UX FIX: Rename App ★★★ */
         #icity-app-icon::after { content: 'icity'; }
         #dev2-app-icon::after { content: '待开发'; }
 
@@ -1085,7 +1084,6 @@
         }
         .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
-        /* ★★★ UI/UX FIX: Constrain Modal to Phone Frame ★★★ */
         .custom-modal-overlay {
             position: absolute;
             top: 0;
@@ -1632,6 +1630,7 @@
             font-size: 13px;
             color: #666;
             border-left: 2px solid var(--ios-blue);
+            cursor: pointer;
         }
         .message-reply-preview strong {
             color: #333;
@@ -1786,7 +1785,6 @@
             stroke-width: 1.5;
         }
         
-        /* ★★★ UI/UX FIX: Unify Red Packet and Transfer Bubble Size ★★★ */
         .red-packet-bubble, .transfer-bubble {
             border-radius: 8px;
             padding: 0;
@@ -1825,7 +1823,6 @@
         .financial-text { flex-grow: 1; overflow: hidden; }
         .financial-text p { font-size: 15px; font-weight: 500; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white;}
         
-        /* ★★★ UI/UX FIX: Transfer Remark Layout ★★★ */
         .transfer-bubble .financial-text {
             display: flex;
             justify-content: space-between;
@@ -1909,7 +1906,6 @@
         }
         .ai-status-box p:last-of-type { margin-bottom: 0; }
 
-        /* ★★★ UI/UX FIX: Financial Modal Styling ★★★ */
         .financial-modal-body {
             background-color: var(--ios-system-gray);
             padding: 0;
@@ -2287,7 +2283,6 @@
             opacity: 1;
         }
         
-        /* ★★★ NEW FEATURE: Image Message Styling ★★★ */
         .image-message-content {
             max-width: 200px;
             max-height: 200px;
@@ -2808,7 +2803,6 @@
                                 <span class="settings-action-label">设置备注和标签</span>
                                 <span class="settings-action-arrow">&gt;</span>
                             </div>
-                            <!-- ★★★ UI/UX FIX: Rename Setting ★★★ -->
                             <div id="edit-contact-info-btn" class="settings-action-item">
                                 <span class="settings-action-label">编辑设定</span>
                                 <span class="settings-action-arrow">&gt;</span>
@@ -2828,7 +2822,6 @@
             <footer id="chat-page-footer">
                 <div id="more-actions-panel">
                     <div class="action-grid">
-                        <!-- ★★★ NEW FEATURE: Album action triggers image upload ★★★ -->
                         <div class="action-grid-item" data-action="album">
                             <div class="action-grid-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -2925,7 +2918,6 @@
             <div class="home-indicator-container"><div class="home-indicator"></div></div>
         </div>
 
-        <!-- ★★★ UI/UX FIX: All modals are now inside the phone frame to prevent "popping out" ★★★ -->
         <div id="custom-modal-overlay" class="custom-modal-overlay">
             <div class="custom-modal-box">
                 <div id="custom-modal-content" class="custom-modal-content">
@@ -3164,7 +3156,6 @@
             
             const backToMeFromWalletBtn = document.getElementById('back-to-me-from-wallet-btn');
             const walletBalanceAmount = document.getElementById('wallet-balance-amount');
-            const walletTopupBtn = document.getElementById('wallet-topup-btn');
             const walletWithdrawBtn = document.getElementById('wallet-withdraw-btn');
             const walletDetailsBtn = document.getElementById('wallet-details-btn');
             const backToWalletBtn = document.getElementById('back-to-wallet-btn');
@@ -4028,7 +4019,6 @@
                 return imgBubble;
             };
 
-            // ★★★ NEW FEATURE: Image Message Element ★★★
             const createImageMessageElement = (msg) => {
                 const contentEl = document.createElement('div');
                 contentEl.className = 'image-message-content';
@@ -4154,7 +4144,6 @@
                     const clothingRule = "`clothing`: (string) 角色当前穿着的详细描述。此部分内容在一般聊天中用户不可见，但必须根据情景、天气或故事背景进行合理想象并填写。如果角色设定（如非人形）导致没有穿着，则填写“无”。";
                     const locationRule = "`location`: (string) 角色此时此刻所处的【具体地点】。这部分用户不可见，但你必须根据对话上下文和故事发展合理地更新此地点。例如：“咖啡馆的窗边”、“自己的书房里”、“熙熙攘攘的街头”。";
                     const replyRule = "`reply`: (string) 你作为角色要发送给用户的最终消息。这条消息本身必须遵循下述的【括号铁律 - 最高优先级命令】。";
-                    // ★★★ AI LOGIC FIX: Enhanced parenthesis rule ★★★
                     const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用一对完整的英文括号 () 包围】。括号内的描述可以出现在句子的任何位置，例如：`你好啊(歪头看着你)` 或 `(我笑了笑)没错`。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。【特例】：如果回复内容本身是代码（如HTML/JS/CSS），则代码中的括号不受此限制，可以自由使用。这是一个不可违背的规则。";
                     const scenarioRule = "【场景切换规则】默认情况下，你处于【模拟线下场景】。但如果用户提出的是一个纯粹的、需要直接、客观回答的【知识性或指令性问题】（例如：“鲁迅和周树人是什么关系？”或“帮我写一段代码”），你必须临时切换到【线上聊天场景】。在此场景下，你的`reply`字段中【不应】包含描述共享环境的文字，但【仍然必须】遵守【括号铁律】，使用括号 `()` 描述你自己的动作或神态（例如：(笑了笑) 鲁迅和周树人是同一个人。）。完成回答后，你应在下一次互动中自动恢复到【模拟线下场景】。";
                     const priorityRule = "【知识优先级】你必须优先使用你的核心【角色设定】中的信息。当【世界设定书】中的信息与你的核心设定冲突时，以你的核心设定为准。世界设定书是你记忆的补充，而不是替代。";
@@ -4162,9 +4151,7 @@
                     const aiWalletBalance = contact.walletBalance || 0;
                     const walletRule = `【钱包铁律】你的零钱余额为 ${aiWalletBalance.toFixed(2)} 元。在决定是否同意用户的金融请求（如发红包、转账）时，你必须确保你有足够的余额。如果余额不足，你必须拒绝请求。`;
                     
-                    // ★★★ AI CAPABILITY: Allow AI to actively perform financial actions ★★★
                     const financialDecisionRule = "【金融决策铁律】如果用户向你提出任何关于【要钱】的请求（如“给我转账”、“给我发红包”），或者在对话中，你根据你的【角色设定】和【钱包铁律】自主判断认为应该给对方【发红包】或【转账】，你都必须自主作出【同意】或【拒绝】的决定。如果【同意】，你必须在`reply`字段中使用`[TRANSFER:金额,留言]`或`[RED_PACKET:金额,祝福语]`指令来完成操作。如果【拒绝】，则正常回复即可。";
-                    // ★★★ AI CAPABILITY & AI VISION: Update commands ★★★
                     const commandRule = "【特殊指令】如果想实现特殊操作，必须在`reply`字段中插入如下指令：引用=`[QUOTE:你想引用的内容]`；发语音=`[VOICE:语音的文字内容]`；发图片=`[IMAGE:图片的文字描述]`；发红包=`[RED_PACKET:总金额,祝福语]`；转账=`[TRANSFER:金额,留言]`；退还转账=`[REFUND_TRANSFER]`；【撤回上一条消息】=`[RECALL]`（你可以自主决定是否使用此指令，比如当你觉得上一句话不妥时）；发网页/代码=`[HTML:你的完整HTML代码]`。指令必须精确，不能有任何多余字符。";
                     const userBehaviorRule = "【用户行为铁律】你绝对禁止杜撰、扮演或描述任何属于对方的行为、语言或心理活动。你必须用'你'或对方的名字来称呼对方，绝对禁止使用'用户'这个词。";
                     const emojiBanRule = "【表情包禁止】你绝对禁止在回复中使用任何形式的 emoji 表情符号。";
@@ -4235,7 +4222,6 @@
                     
                     const finalInstruction = [jsonRule, parenthesesRule, timeInstruction, walletRule, thoughtsRule, actionRule, clothingRule, locationRule, replyRule, scenarioRule, financialDecisionRule, priorityRule, commandRule, emojiBanRule, userBehaviorRule, example, aiInstruction, worldBookInstruction, userInstruction].filter(Boolean).join('\n\n');
                     
-                    // ★★★ AI VISION: Check if the selected model is a vision model ★★★
                     const isVisionModel = modelName.includes('vision') || modelName.includes('v');
                     
                     const primingMessages = [
@@ -4243,21 +4229,28 @@
                         { role: 'assistant', content: "```json\n{\n  \"thoughts\": \"指令已收到并完全理解。我将作为角色开始对话，并严格遵守所有规则，尤其是钱包、括号和用户角色设定铁律。\",\n  \"action\": \"准备就绪\",\n  \"clothing\": \"无\",\n  \"location\": \"未知\",\n  \"reply\": \"(我准备好了，随时可以开始聊天。)\"\n}\n```" }
                     ];
                     
-                    // ★★★ AI VISION: Prepare messages for API, including images ★★★
                     const messagesForAPI = [
                         ...primingMessages, 
                         ...filteredHistory.map(m => {
                             const sender = m.role === 'user' ? 'user' : 'assistant';
                             let apiContent;
+                            let fullContent;
 
-                            let quoteContent = '';
-                            if (m.replyTo) quoteContent = ` (回复 ${m.replyTo.sender}: "${m.replyTo.content}")`;
-                            else if (m.aiQuote) quoteContent = ` (引用 ${m.aiQuote.sender}: "${m.aiQuote.content}")`;
+                            if (m.replyTo) {
+                                fullContent = `(回复 ${m.replyTo.sender}: "${m.replyTo.content}") ${m.content}`;
+                            } else if (m.aiQuote) {
+                                fullContent = `(引用 ${m.aiQuote.sender}: "${m.aiQuote.content}") ${m.content}`;
+                            } else {
+                                fullContent = m.content;
+                            }
                             
                             if (isVisionModel && m.type === 'image') {
-                                apiContent = [{ type: "text", text: `[${sender}发送了一张图片]${quoteContent}` }, { type: "image_url", image_url: { url: m.imageUrl } }];
+                                apiContent = [{ type: "text", text: `[${sender}发送了一张图片]` }, { type: "image_url", image_url: { url: m.imageUrl } }];
+                                if (m.replyTo) {
+                                    apiContent[0].text += ` (回复 ${m.replyTo.sender}: "${m.replyTo.content}")`;
+                                }
                             } else if (m.type === 'image') {
-                                apiContent = `[${sender}发送了一张图片，但我无法查看。]${quoteContent}`;
+                                apiContent = `[${sender}发送了一张图片，但我无法查看。]`;
                             } else if(m.type === 'red-packet') {
                                 let stateText = '';
                                 const openedCount = (m.redPacket.openers || []).length;
@@ -4270,17 +4263,16 @@
                                 if (m.transfer.received === true) stateText = ' (已收款)';
                                 else if (m.transfer.received === 'refunded') stateText = ' (已退还)';
                                 apiContent = `[${sender}进行了一笔转账: ${m.transfer.text}, 金额: ${m.transfer.amount.toFixed(2)}]${stateText}`;
-                            } else if (m.type === 'voice') apiContent = `[${sender}发送了一段语音: ${m.content}]`;
-                            else if (m.type === 'described-image') apiContent = `[${sender}发送了一张图片: ${m.content}]`;
+                            } else if (m.type === 'voice') apiContent = `[${sender}发送了一段语音: ${fullContent}]`;
+                            else if (m.type === 'described-image') apiContent = `[${sender}发送了一张图片: ${fullContent}]`;
                             else if (m.type === 'html') apiContent = `[${sender}发送了一段代码片段]`;
-                            else apiContent = m.content + quoteContent;
+                            else apiContent = fullContent;
                             
                             return { role: m.role, content: apiContent };
                         })
                     ];
                     
                     const requestBody = { model: modelName, messages: messagesForAPI, stream: false };
-                    // For vision models, a max_tokens parameter is often useful
                     if (isVisionModel) {
                         requestBody.max_tokens = 4096;
                     }
@@ -5483,7 +5475,6 @@
                 body.classList.remove('more-actions-visible');
             });
             
-            // ★★★ UI/UX FIX: New financial modals ★★★
             async function showTransferModal() {
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const modalHtml = `
@@ -5527,7 +5518,6 @@
                 let groupOptions = '';
 
                 if (isGroup) {
-                    // Group options for red packet - not fully implemented in this version
                     groupOptions = `
                         <div class="modal-amount-section">
                             <div class="modal-amount-row">
@@ -5689,7 +5679,6 @@
                         await addMessageToUI(msg);
                         clearReply();
                     }
-                // ★★★ NEW FEATURE: Trigger image upload from album ★★★
                 } else if (action === 'album') {
                     imageUploadInput.click();
                 } else if (['video-call', 'location', 'voice-call'].includes(action)) {
@@ -5697,7 +5686,6 @@
                 }
             });
 
-            // ★★★ NEW FEATURE: Handle image upload and send ★★★
             async function handleImageUploadAndSend(file) {
                  if (!file) return;
 
@@ -5755,7 +5743,6 @@
                 }
                 const img = e.target.closest('.image-message-content img');
                 if (img) {
-                    // Basic image preview for now
                     const { action } = await showCustomModal({ title: '图片预览', rawHTML: `<img src="${img.src}" style="max-width: 100%; border-radius: 8px;">`, buttons: [{id: 'close', text: '关闭', class: 'confirm'}]});
                     return;
                 }
@@ -5818,16 +5805,19 @@
                     const response = await fetch(`${baseURL}/v1/models`, { headers: { 'Authorization': `Bearer ${apiKey}` } });
                     if (!response.ok) throw new Error(`HTTP 错误! 状态码: ${response.status}`);
                     const data = await response.json();
+                    const currentModel = modelSelect.value;
                     modelSelect.innerHTML = '';
                     data.data.map(m => m.id).sort().forEach(modelId => {
                         const option = document.createElement('option');
                         option.value = modelId;
                         option.textContent = modelId;
+                        if(modelId === currentModel) option.selected = true;
                         modelSelect.appendChild(option);
                     });
                     showToast('模型列表已成功加载！');
                 } catch (error) {
                     showToast('拉取模型失败，请检查配置', 'warning');
+                    console.error(error);
                 } finally {
                     fetchModelsBtn.disabled = false; fetchModelsBtn.textContent = '获取模型列表';
                 }
@@ -5840,7 +5830,8 @@
                     buttonLayout: 'row',
                     preferredConfirmRight: true,
                 });
-                if (action === 'confirm' && values.presetName.trim()) {
+
+                if (action === 'confirm' && values.presetName && values.presetName.trim()) {
                     const presetName = values.presetName.trim();
                     const newPreset = { name: presetName, baseURL: baseUrlInput.value.trim(), apiKey: apiKeyInput.value.trim(), modelName: modelSelect.value };
                     let presets = await getPresets();
@@ -5876,7 +5867,17 @@
                 if (selectedPreset) {
                     baseUrlInput.value = selectedPreset.baseURL;
                     apiKeyInput.value = selectedPreset.apiKey;
-                    modelSelect.value = selectedPreset.modelName;
+                    const modelToSelect = selectedPreset.modelName;
+
+                    const modelExists = Array.from(modelSelect.options).some(opt => opt.value === modelToSelect);
+                    if (!modelExists && modelToSelect) {
+                        const option = document.createElement('option');
+                        option.value = modelToSelect;
+                        option.textContent = modelToSelect;
+                        modelSelect.appendChild(option);
+                    }
+                    modelSelect.value = modelToSelect;
+
                     baseUrlInput.classList.toggle('has-content', baseUrlInput.value.length > 0);
                     apiKeyInput.classList.toggle('has-content', apiKeyInput.value.length > 0);
                     showToast(`已加载预设 "${selectedPreset.name}"`);
@@ -6715,7 +6716,6 @@
                     buttons: [{id: 'close', text: '关闭', class: 'confirm'}]
                 });
                 
-                // After modal is shown, render avatars inside
                 const openerItems = modalOverlay.querySelectorAll('.rp-details-list-item');
                 openerItems.forEach((item, i) => {
                     const avatarEl = item.querySelector('.avatar');
@@ -6796,7 +6796,6 @@
                 if (!contact) return;
                 const newBalance = (contact.walletBalance || 0) + amount;
                 await db.contacts.update(contact.id, { walletBalance: newBalance });
-                // We could log AI transactions too if needed, but skipping for now to keep it simple.
             }
             
             async function renderWalletPage() {
@@ -6845,34 +6844,24 @@
                 const now = Date.now();
                 const twentyFourHours = 24 * 60 * 60 * 1000;
 
-                // Check pending red packets from AI
-                const contactsWithPendingRPs = await db.contacts.toArray();
-                for (const contact of contactsWithPendingRPs) {
-                    const history = await loadChatHistory(contact.contactId);
+                const allChatHistories = await db.chatHistories.toArray();
+
+                for (const historyDoc of allChatHistories) {
                     let historyModified = false;
-                    for(const msg of history) {
+                    for (const msg of historyDoc.messages) {
                         if (msg.role === 'assistant' && msg.type === 'red-packet' && msg.redPacket.status === 'pending' && (now - msg.timestamp > twentyFourHours)) {
                              msg.redPacket.status = 'refunded';
-                             await addAITransaction('red-packet-refunded', msg.redPacket.totalAmount, contact.contactId);
+                             await addAITransaction('red-packet-refunded', msg.redPacket.totalAmount, historyDoc.contactId);
                              historyModified = true;
                         }
-                    }
-                    if(historyModified) await saveChatHistory(contact.contactId, history);
-                }
-
-                // Check pending transfers from user
-                const contactsWithPendingTransfers = await db.contacts.toArray();
-                for (const contact of contactsWithPendingTransfers) {
-                     const history = await loadChatHistory(contact.contactId);
-                     let historyModified = false;
-                     for (const msg of history) {
-                         if (msg.role === 'user' && msg.type === 'transfer' && msg.transfer.received === false && (now - msg.timestamp > twentyFourHours)) {
+                        if (msg.role === 'user' && msg.type === 'transfer' && msg.transfer.received === false && (now - msg.timestamp > twentyFourHours)) {
                             msg.transfer.received = 'refunded';
+                            const contact = await db.contacts.get({contactId: historyDoc.contactId});
                             await addUserTransaction('transfer-refunded', msg.transfer.amount, `退款-来自${getDisplayName(contact)}`);
                             historyModified = true;
                          }
-                     }
-                     if(historyModified) await saveChatHistory(contact.contactId, history);
+                    }
+                    if (historyModified) await saveChatHistory(historyDoc.contactId, historyDoc.messages);
                 }
             }
 
@@ -6955,7 +6944,7 @@
                 }
             });
             
-            modalOverlay.addEventListener('click', e => {
+            modalOverlay.addEventListener('click',e => {
                 const uploader = e.target.closest('.avatar-uploader');
                 if (uploader) {
                     uploader.querySelector('input[type="file"]').click();
@@ -6965,9 +6954,28 @@
                     e.target.disabled = true;
                     db.contacts.where({contactId: currentChatContactId}).modify({ chatSpecificAvatars: {} }).then(() => {
                         showToast('已恢复默认头像');
-                        const previews = modalOverlay.querySelectorAll('.avatar-preview');
-                        previews.forEach(p => p.style.backgroundImage = '');
-                        e.target.disabled = false;
+                        const userPreview = modalOverlay.querySelector('.avatar-uploader[data-target="user"] .avatar-preview');
+                        const assistantPreview = modalOverlay.querySelector('.avatar-uploader[data-target="assistant"] .avatar-preview');
+                        
+                        // We need to fetch the default avatars to reset the preview correctly
+                        (async () => {
+                            const contact = await db.contacts.get({contactId: currentChatContactId});
+                            let myAvatarPreview = '';
+                            const mask = contact.boundMaskId ? await db.masks.get({maskId: contact.boundMaskId}) : null;
+                            if (mask && mask.avatar) {
+                                myAvatarPreview = mask.avatar;
+                            } else {
+                                const profile = await db.userProfile.get('main');
+                                myAvatarPreview = profile.avatar || '';
+                            }
+                            
+                            let theirAvatarPreview = contact.avatar || '';
+
+                            if(userPreview) userPreview.style.backgroundImage = `url(${myAvatarPreview})`;
+                            if(assistantPreview) assistantPreview.style.backgroundImage = `url(${theirAvatarPreview})`;
+
+                            e.target.disabled = false;
+                        })();
                     });
                 }
             });
