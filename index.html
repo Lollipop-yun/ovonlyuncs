@@ -197,22 +197,25 @@
         #api-settings-icon { background-image: url('https://pic1.imgdb.cn/item/68de6748c5157e1a885035cd.jpg'); }
         #forum-app-icon { background-image: url('https://pic1.imgdb.cn/item/68de6756c5157e1a885035e3.jpg'); }
         #worldbook-app-icon { background-image: url('https://pic1.imgdb.cn/item/68de6762c5157e1a885035f7.jpg'); }
-        #dev1-app-icon { background-image: url('https://pic1.imgdb.cn/item/68de6770c5157e1a88503613.jpg'); }
+        #icity-app-icon { background-image: url('https://pic1.imgdb.cn/item/68de6770c5157e1a88503613.jpg'); }
         #dev2-app-icon { background-image: url('https://pic1.imgdb.cn/item/68de677fc5157e1a8850362c.jpg'); }
 
         .app-icon::after {
+            content: attr(data-app-name);
             position: absolute;
             bottom: -20px;
             font-size: 12px;
             color: var(--text-dark);
         }
+        
         #reopen-app-icon::after { content: '微信'; }
         #api-settings-icon::after { content: '设置'; }
         #theme-icon::after { content: '主题'; }
-        
         #forum-app-icon::after { content: '论坛'; }
         #worldbook-app-icon::after { content: '世界书'; }
-        #dev1-app-icon::after, #dev2-app-icon::after { content: '待开发'; }
+        /* ★★★ UI/UX FIX: Rename App ★★★ */
+        #icity-app-icon::after { content: 'icity'; }
+        #dev2-app-icon::after { content: '待开发'; }
 
         .disabled-icon {
             opacity: 0.6;
@@ -502,7 +505,6 @@
             background-color: var(--ios-system-gray);
         }
 
-        /* ★★★ UI/UX FIX: Smoother transition for chat settings ★★★ */
         body.edit-contact-active #contacts-page,
         body.edit-contact-active #chat-settings-page,
         body.edit-contact-active #wechat-main-page,
@@ -521,7 +523,6 @@
             transform: translateX(-30%);
             transition: transform 0.3s ease-in-out;
         }
-        /* The chat page no longer moves when settings open */
         body.chat-settings-active #chat-page {
             transform: translateX(0); /* Stays put */
             filter: brightness(0.95);
@@ -1084,6 +1085,7 @@
         }
         .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
+        /* ★★★ UI/UX FIX: Constrain Modal to Phone Frame ★★★ */
         .custom-modal-overlay {
             position: absolute;
             top: 0;
@@ -1784,6 +1786,7 @@
             stroke-width: 1.5;
         }
         
+        /* ★★★ UI/UX FIX: Unify Red Packet and Transfer Bubble Size ★★★ */
         .red-packet-bubble, .transfer-bubble {
             border-radius: 8px;
             padding: 0;
@@ -1812,16 +1815,17 @@
             padding: 15px 15px;
         }
         
-        /* ★★★ UI/UX FIX: Remove red packet icon and adjust padding ★★★ */
         .red-packet-bubble .financial-content svg {
              display: none; 
         }
         .red-packet-bubble .financial-content {
-            padding: 15px 15px; /* Adjust padding to be consistent */
+            padding: 15px 15px;
         }
 
         .financial-text { flex-grow: 1; overflow: hidden; }
         .financial-text p { font-size: 15px; font-weight: 500; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white;}
+        
+        /* ★★★ UI/UX FIX: Transfer Remark Layout ★★★ */
         .transfer-bubble .financial-text {
             display: flex;
             justify-content: space-between;
@@ -1831,21 +1835,28 @@
         }
         .transfer-bubble .transfer-main-status {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            flex-direction: row;
+            align-items: baseline;
+            gap: 6px;
         }
         .transfer-bubble .transfer-main-status p { font-size: 15px; font-weight: 500; color: white; }
-        .transfer-bubble .transfer-main-status .transfer-remark { font-size: 12px; font-weight: 400; color: rgba(255,255,255,0.8); }
-
-        .transfer-bubble .transfer-amount { font-size: 15px; font-weight: 500; display: block; color: white; }
+        .transfer-bubble .transfer-main-status .transfer-remark-inline { 
+            font-size: 12px; 
+            font-weight: 400; 
+            color: rgba(255,255,255,0.8);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .transfer-bubble .transfer-amount { font-size: 15px; font-weight: 500; display: block; color: white; margin-top: 4px; }
 
         .red-packet-bubble .financial-text p { color: white; }
         
         .red-packet-bubble.opened .financial-text p, .red-packet-bubble.opened .financial-text span,
         .red-packet-bubble.refunded .financial-text p, .red-packet-bubble.refunded .financial-text span,
         .red-packet-bubble.empty .financial-text p, .red-packet-bubble.empty .financial-text span,
-        .transfer-bubble.received .financial-text p, .transfer-bubble.received .transfer-remark, .transfer-bubble.received .transfer-amount,
-        .transfer-bubble.refunded .financial-text p, .transfer-bubble.refunded .transfer-remark, .transfer-bubble.refunded .transfer-amount {
+        .transfer-bubble.received .financial-text p, .transfer-bubble.received .transfer-remark-inline, .transfer-bubble.received .transfer-amount,
+        .transfer-bubble.refunded .financial-text p, .transfer-bubble.refunded .transfer-remark-inline, .transfer-bubble.refunded .transfer-amount {
              color: var(--text-placeholder);
         }
         
@@ -1898,6 +1909,7 @@
         }
         .ai-status-box p:last-of-type { margin-bottom: 0; }
 
+        /* ★★★ UI/UX FIX: Financial Modal Styling ★★★ */
         .financial-modal-body {
             background-color: var(--ios-system-gray);
             padding: 0;
@@ -1932,13 +1944,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            width: 100%;
         }
         .financial-modal-body .modal-amount-section .currency-symbol {
             font-size: 30px;
             font-weight: 300;
             margin-right: 15px;
         }
-        /* ★★★ UI/UX FIX: Ensure financial inputs are treated as native text inputs for better mobile keyboard behavior ★★★ */
         .financial-modal-body .modal-amount-section input,
         .financial-modal-body .modal-text-section input,
         .financial-modal-body .modal-text-section textarea,
@@ -1951,7 +1963,6 @@
             font-size: 16px;
             padding: 5px 0;
             font-family: inherit;
-            /* This helps mobile browsers treat it as a standard text field */
             -webkit-user-select: text; 
             user-select: text;
         }
@@ -2275,6 +2286,23 @@
         .described-image-bubble.show-text .described-image-text {
             opacity: 1;
         }
+        
+        /* ★★★ NEW FEATURE: Image Message Styling ★★★ */
+        .image-message-content {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--ios-border-color);
+            background-color: #e0e0e0;
+        }
+        .image-message-content img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
 
     </style>
 </head>
@@ -2344,7 +2372,7 @@
                     <div class="app-grid app-grid-bottom">
                         <div id="forum-app-icon" class="app-icon custom-icon disabled-icon"></div>
                         <div id="worldbook-app-icon" class="app-icon custom-icon"></div>
-                        <div id="dev1-app-icon" class="app-icon disabled-icon custom-icon"></div>
+                        <div id="icity-app-icon" class="app-icon custom-icon disabled-icon"></div>
                         <div id="dev2-app-icon" class="app-icon disabled-icon custom-icon"></div>
                     </div>
                 </div>
@@ -2499,10 +2527,7 @@
                 </header>
                 <main class="settings-content">
                     <div class="settings-group">
-                        <div class="form-group">
-                            <label for="wb-edit-name">文件名称</label>
-                            <input type="text" id="wb-edit-name" placeholder="为设定起一个名字">
-                        </div>
+                        <div class="form-group"><label for="wb-edit-name">文件名称</label><input type="text" id="wb-edit-name" placeholder="为设定起一个名字"></div>
                     </div>
                     <div class="settings-group">
                         <div class="form-group">
@@ -2755,7 +2780,6 @@
                                 <span class="settings-action-label">设置当前聊天背景</span>
                                 <span class="settings-action-arrow">&gt;</span>
                             </div>
-                            <!-- ★★★ NEW FEATURE: Change Chat Avatars ★★★ -->
                             <div id="change-chat-avatars-btn" class="settings-action-item">
                                 <span class="settings-action-label">更换聊天头像</span>
                                 <span class="settings-action-arrow">&gt;</span>
@@ -2784,8 +2808,9 @@
                                 <span class="settings-action-label">设置备注和标签</span>
                                 <span class="settings-action-arrow">&gt;</span>
                             </div>
+                            <!-- ★★★ UI/UX FIX: Rename Setting ★★★ -->
                             <div id="edit-contact-info-btn" class="settings-action-item">
-                                <span class="settings-action-label">编辑AI设定</span>
+                                <span class="settings-action-label">编辑设定</span>
                                 <span class="settings-action-arrow">&gt;</span>
                             </div>
                         </div>
@@ -2803,6 +2828,7 @@
             <footer id="chat-page-footer">
                 <div id="more-actions-panel">
                     <div class="action-grid">
+                        <!-- ★★★ NEW FEATURE: Album action triggers image upload ★★★ -->
                         <div class="action-grid-item" data-action="album">
                             <div class="action-grid-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -2842,6 +2868,7 @@
                         </div>
                         <div class="action-grid-item" data-action="voice-call"><div class="action-grid-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg></div><span class="action-grid-label">语音通话</span></div>
                     </div>
+                    <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
                 </div>
                 <div id="reply-preview-bar">
                     <div class="reply-preview-content"></div>
@@ -2882,7 +2909,7 @@
                     <div>消息</div>
                 </div>
                 <div id="tab-contacts" class="tab-item">
-                    <svg viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><path d="M9 3a4 4 0 0 1 0 8a4 4 0 0 1 0-8z" /><path d="M23 20v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75"/svg>
+                    <svg viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><path d="M9 3a4 4 0 0 1 0 8a4 4 0 0 1 0-8z" /><path d="M23 20v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
                     <div>通讯录</div>
                 </div>
                 <div id="tab-discover" class="tab-item">
@@ -2898,6 +2925,7 @@
             <div class="home-indicator-container"><div class="home-indicator"></div></div>
         </div>
 
+        <!-- ★★★ UI/UX FIX: All modals are now inside the phone frame to prevent "popping out" ★★★ -->
         <div id="custom-modal-overlay" class="custom-modal-overlay">
             <div class="custom-modal-box">
                 <div id="custom-modal-content" class="custom-modal-content">
@@ -2908,7 +2936,6 @@
                 </div>
             </div>
         </div>
-        
         <div id="main-add-menu-overlay"></div>
         <ul id="main-add-menu">
             <li id="menu-start-new-chat">
@@ -2920,14 +2947,12 @@
                 <span>创建群聊</span>
             </li>
         </ul>
-
         <div id="forward-contact-picker-modal">
             <div class="forward-picker-box">
                 <div class="forward-picker-header">选择一个联系人</div>
                 <div class="forward-picker-list"></div>
             </div>
         </div>
-
         <div id="ai-status-modal">
             <div class="ai-status-box">
                 <h3>AI状态</h3>
@@ -2937,7 +2962,6 @@
                 <p id="ai-status-action">(暂无)</p>
                 <h4>此刻的穿着</h4>
                 <p id="ai-status-clothing">(暂无)</p>
-                <!-- ★★★ NEW FEATURE: AI Location ★★★ -->
                 <h4>此刻的位置</h4>
                 <p id="ai-status-location">(暂无)</p>
             </div>
@@ -2948,7 +2972,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const db = new Dexie('WeChatDB');
             
-            db.version(23).stores({
+            db.version(24).stores({
                 contacts: '++id, &contactId, name, type, members, remark, isPinned, isTimeSensingEnabled, lastMessageTimestamp, lastMessageContent, boundMaskId, *boundWorldBookFolders, chatBackground, lastAiThoughts, lastAiAction, lastAiClothing, lastAiLocation, walletBalance, chatSpecificAvatars',
                 chatHistories: '&contactId, messages',
                 settings: '&key, data',
@@ -2958,11 +2982,6 @@
                 worldBook: '++id, type, name, folderId, content',
                 userProfile: '&key, value',
                 transactions: '++id, timestamp, type, contactId'
-            }).upgrade(tx => {
-                return tx.table('contacts').toCollection().modify(contact => {
-                    if (contact.lastAiLocation === undefined) contact.lastAiLocation = '';
-                    if (contact.chatSpecificAvatars === undefined) contact.chatSpecificAvatars = {};
-                });
             });
 
             // Element Selectors
@@ -3152,6 +3171,7 @@
             const walletDetailsList = document.getElementById('wallet-details-list');
 
             const changeChatAvatarsBtn = document.getElementById('change-chat-avatars-btn');
+            const imageUploadInput = document.getElementById('image-upload-input');
 
             // State variables
             let currentChatContactId = null;
@@ -3197,7 +3217,6 @@
                 widgetTime.textContent = timeString;
             };
             
-            // ★★★ NEW FEATURE: Real Battery Sync ★★★
             const updateBattery = async () => {
                 try {
                     if ('getBattery' in navigator) {
@@ -3212,7 +3231,6 @@
                     }
                 } catch(e) {
                     console.warn("Could not access Battery API.", e);
-                    // Fallback to time-based simulation
                     const now = new Date();
                     batteryLevel.style.width = `${(60 - now.getSeconds()) / 60 * 100}%`;
                 }
@@ -3377,7 +3395,7 @@
                 contactEditorReturnPath = returnPath;
                 tempAvatarDataUrl = contact ? contact.avatar : null;
                 
-                editContactTitle.textContent = contact ? '编辑AI设定' : '添加朋友';
+                editContactTitle.textContent = contact ? '编辑设定' : '添加朋友';
                 saveContactBtn.textContent = contact ? '完成' : '保存';
                 
                 contactNameInput.value = contact ? contact.name : '';
@@ -3547,7 +3565,7 @@
                     }
 
                     let previewHTML = contact.lastMessageContent || '';
-                    previewHTML = previewHTML.replace(/\[(红包|转账|语音|图片|聊天记录|代码片段)\]/g, '[$1] ');
+                    previewHTML = previewHTML.replace(/\[(红包|转账|语音|图片|聊天记录|代码片段|相册)\]/g, '[$1] ');
 
                     item.innerHTML = `
                         ${avatarHTML}
@@ -3629,7 +3647,7 @@
                         message: '选择操作',
                         buttons: [
                             { id: 'send-message', text: '发送消息', class: 'confirm' },
-                            { id: 'edit-info', text: '编辑信息' },
+                            { id: 'edit-info', text: '编辑设定' },
                             { id: 'cancel', text: '取消' }
                         ],
                         buttonLayout: 'column'
@@ -3647,7 +3665,6 @@
                 openContactEditor(null, 'contacts');
             });
 
-            // ★★★ NEW FEATURE: Update chat-specific avatars ★★★
             const updateUserAvatarsInChat = async () => {
                 if (!currentChatContactId) return;
                 const contact = await db.contacts.get({contactId: currentChatContactId});
@@ -3794,6 +3811,8 @@
                     messageElement = createDescribedImageElement(msg);
                 } else if (msg.type === 'html') {
                     messageElement = createHtmlMessageElement(msg);
+                } else if (msg.type === 'image') {
+                    messageElement = createImageMessageElement(msg);
                 } else {
                     messageElement = createTextMessageElement(msg);
                 }
@@ -3883,6 +3902,7 @@
                 } else if (msg.type === 'red-packet') previewContent = '[红包]';
                 else if (msg.type === 'transfer') previewContent = '[转账]';
                 else if (msg.type === 'voice') previewContent = '[语音]';
+                else if (msg.type === 'image') previewContent = '[相册]';
                 else if (msg.type === 'described-image') previewContent = '[图片]';
                 else if (msg.type === 'merged') previewContent = '[聊天记录]';
                 else if (msg.type === 'html') previewContent = '[代码片段]';
@@ -3952,7 +3972,6 @@
                 return contentEl;
             };
 
-            // ★★★ UI/UX FIX: Improved HTML message display ★★★
             const createHtmlMessageElement = (msg) => {
                 const contentEl = document.createElement('div');
                 contentEl.className = 'html-message-content';
@@ -3970,7 +3989,7 @@
                             body { 
                                 margin: 0; 
                                 font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif; 
-                                font-size: 13px; /* Smaller font */
+                                font-size: 13px;
                                 line-height: 1.4; 
                             }
                             * { box-sizing: border-box; }
@@ -3980,8 +3999,12 @@
                     doc.close();
                     
                     const setIframeHeight = () => {
-                        const contentHeight = doc.body.scrollHeight;
-                        iframe.style.height = contentHeight + 'px';
+                        try {
+                            const contentHeight = doc.body.scrollHeight;
+                            iframe.style.height = contentHeight + 'px';
+                        } catch(e) {
+                            console.warn("Could not access iframe content for height calculation, possibly due to cross-origin policies.", e);
+                        }
                     };
 
                     setIframeHeight();
@@ -4003,6 +4026,16 @@
                     imgBubble.classList.toggle('show-text');
                 });
                 return imgBubble;
+            };
+
+            // ★★★ NEW FEATURE: Image Message Element ★★★
+            const createImageMessageElement = (msg) => {
+                const contentEl = document.createElement('div');
+                contentEl.className = 'image-message-content';
+                const img = document.createElement('img');
+                img.src = msg.imageUrl;
+                contentEl.appendChild(img);
+                return contentEl;
             };
 
             const createMergedForwardElement = (msg) => {
@@ -4049,6 +4082,7 @@
                         if(recalledContent.type === 'red-packet') contentToShow = `[红包] ${recalledContent.redPacket.text}`;
                         else if (recalledContent.type === 'transfer') contentToShow = `[转账] ¥${recalledContent.transfer.amount.toFixed(2)}`;
                         else if (recalledContent.type === 'voice') contentToShow = `[语音] ${recalledContent.content}`;
+                        else if (recalledContent.type === 'image') contentToShow = `[相册] 图片消息无法预览`;
                         else if (recalledContent.type === 'described-image') contentToShow = `[图片] ${recalledContent.content}`;
                         else if (recalledContent.type === 'html') contentToShow = `[代码片段]\n\n(代码内容较长，无法预览)`;
                         else contentToShow = recalledContent.content || recalledContentRaw;
@@ -4118,19 +4152,20 @@
                     const thoughtsRule = "`thoughts`: (string) 角色的内心独白、真实想法或计划。这部分内容用户看不到，但必须填写。你可以决定是否要撤回消息，如果想撤回，请在这里说明理由。";
                     const actionRule = "`action`: (string) 角色此时此刻的、一个细微的、不为人知的动作或状态。这部分用户也看不到，但必须填写。";
                     const clothingRule = "`clothing`: (string) 角色当前穿着的详细描述。此部分内容在一般聊天中用户不可见，但必须根据情景、天气或故事背景进行合理想象并填写。如果角色设定（如非人形）导致没有穿着，则填写“无”。";
-                    // ★★★ NEW FEATURE: AI Location Instruction ★★★
                     const locationRule = "`location`: (string) 角色此时此刻所处的【具体地点】。这部分用户不可见，但你必须根据对话上下文和故事发展合理地更新此地点。例如：“咖啡馆的窗边”、“自己的书房里”、“熙熙攘攘的街头”。";
                     const replyRule = "`reply`: (string) 你作为角色要发送给用户的最终消息。这条消息本身必须遵循下述的【括号铁律 - 最高优先级命令】。";
-                    const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用英文括号 () 包围】。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。一个括号内的描述本身就可以构成一条完整的`reply`消息，后面不一定需要跟随对话文字。例如，`reply`的值可以是 \"(低头看了看手机)\"。这是一个不可违dei背的规则。";
+                    // ★★★ AI LOGIC FIX: Enhanced parenthesis rule ★★★
+                    const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用一对完整的英文括号 () 包围】。括号内的描述可以出现在句子的任何位置，例如：`你好啊(歪头看着你)` 或 `(我笑了笑)没错`。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。【特例】：如果回复内容本身是代码（如HTML/JS/CSS），则代码中的括号不受此限制，可以自由使用。这是一个不可违背的规则。";
                     const scenarioRule = "【场景切换规则】默认情况下，你处于【模拟线下场景】。但如果用户提出的是一个纯粹的、需要直接、客观回答的【知识性或指令性问题】（例如：“鲁迅和周树人是什么关系？”或“帮我写一段代码”），你必须临时切换到【线上聊天场景】。在此场景下，你的`reply`字段中【不应】包含描述共享环境的文字，但【仍然必须】遵守【括号铁律】，使用括号 `()` 描述你自己的动作或神态（例如：(笑了笑) 鲁迅和周树人是同一个人。）。完成回答后，你应在下一次互动中自动恢复到【模拟线下场景】。";
                     const priorityRule = "【知识优先级】你必须优先使用你的核心【角色设定】中的信息。当【世界设定书】中的信息与你的核心设定冲突时，以你的核心设定为准。世界设定书是你记忆的补充，而不是替代。";
                     
                     const aiWalletBalance = contact.walletBalance || 0;
                     const walletRule = `【钱包铁律】你的零钱余额为 ${aiWalletBalance.toFixed(2)} 元。在决定是否同意用户的金融请求（如发红包、转账）时，你必须确保你有足够的余额。如果余额不足，你必须拒绝请求。`;
                     
-                    const financialDecisionRule = "【金融决策铁律】如果用户向你提出任何关于【要钱】的请求（如“给我转账”、“给我发红包”、“给我打钱”等），你必须基于你的【角色设定】和【钱包铁律】自主作出【同意】或【拒绝】的决定。如果【同意】，你必须在`reply`字段中使用`[TRANSFER:金额,留言]`或`[RED_PACKET:金额,祝福语]`指令来完成操作。如果【拒绝】，则正常回复即可，无需使用指令。";
-                    const commandRule = "【特殊指令】如果想实现特殊操作，必须在`reply`字段中插入如下指令：引用=`[QUOTE:你想引用的内容]`；发语音=`[VOICE:语音的文字内容]`；发图片=`[IMAGE:图片的文字描述]`；发红包=`[RED_PACKET:总金额,祝福语]`；转账=`[TRANSFER:金额,留言]`；退还转账=`[REFUND_TRANSFER]`；撤回上一条消息=`[RECALL]`（你可以自主决定是否使用此指令，比如当你觉得上一句话不妥时）；发网页/代码=`[HTML:你的完整HTML代码]`。指令必须精确，不能有任何多余字符。";
-                    // ★★★ NEW FEATURE: Prevent using the word "User" ★★★
+                    // ★★★ AI CAPABILITY: Allow AI to actively perform financial actions ★★★
+                    const financialDecisionRule = "【金融决策铁律】如果用户向你提出任何关于【要钱】的请求（如“给我转账”、“给我发红包”），或者在对话中，你根据你的【角色设定】和【钱包铁律】自主判断认为应该给对方【发红包】或【转账】，你都必须自主作出【同意】或【拒绝】的决定。如果【同意】，你必须在`reply`字段中使用`[TRANSFER:金额,留言]`或`[RED_PACKET:金额,祝福语]`指令来完成操作。如果【拒绝】，则正常回复即可。";
+                    // ★★★ AI CAPABILITY & AI VISION: Update commands ★★★
+                    const commandRule = "【特殊指令】如果想实现特殊操作，必须在`reply`字段中插入如下指令：引用=`[QUOTE:你想引用的内容]`；发语音=`[VOICE:语音的文字内容]`；发图片=`[IMAGE:图片的文字描述]`；发红包=`[RED_PACKET:总金额,祝福语]`；转账=`[TRANSFER:金额,留言]`；退还转账=`[REFUND_TRANSFER]`；【撤回上一条消息】=`[RECALL]`（你可以自主决定是否使用此指令，比如当你觉得上一句话不妥时）；发网页/代码=`[HTML:你的完整HTML代码]`。指令必须精确，不能有任何多余字符。";
                     const userBehaviorRule = "【用户行为铁律】你绝对禁止杜撰、扮演或描述任何属于对方的行为、语言或心理活动。你必须用'你'或对方的名字来称呼对方，绝对禁止使用'用户'这个词。";
                     const emojiBanRule = "【表情包禁止】你绝对禁止在回复中使用任何形式的 emoji 表情符号。";
 
@@ -4150,7 +4185,7 @@
   "action": "指尖无意识地划过手机屏幕的边缘。",
   "clothing": "穿着一件简约的白色T恤和浅蓝色牛仔裤，看起来很清爽。",
   "location": "市图书馆三楼靠窗的座位",
-  "reply": "(我看到你发的消息，稍微歪了歪头) [QUOTE:你从哪里来？] 以前的事啊...说来话长了。你为什么对这个好奇呢？"
+  "reply": "(我看到你发的消息，稍微歪了歪头) 以前的事啊...说来话长了。你为什么对这个好奇呢？"
 }
 \`\`\``;
 
@@ -4187,7 +4222,6 @@
                         }
                     }
                     
-                    // ★★★ NEW FEATURE: AI Reads Your Mask Persona ★★★
                     let userInstruction = '';
                     if (contact.boundMaskId) {
                         const userMask = await db.masks.get({maskId: contact.boundMaskId});
@@ -4201,22 +4235,30 @@
                     
                     const finalInstruction = [jsonRule, parenthesesRule, timeInstruction, walletRule, thoughtsRule, actionRule, clothingRule, locationRule, replyRule, scenarioRule, financialDecisionRule, priorityRule, commandRule, emojiBanRule, userBehaviorRule, example, aiInstruction, worldBookInstruction, userInstruction].filter(Boolean).join('\n\n');
                     
+                    // ★★★ AI VISION: Check if the selected model is a vision model ★★★
+                    const isVisionModel = modelName.includes('vision') || modelName.includes('v');
+                    
                     const primingMessages = [
                         { role: 'user', content: finalInstruction },
                         { role: 'assistant', content: "```json\n{\n  \"thoughts\": \"指令已收到并完全理解。我将作为角色开始对话，并严格遵守所有规则，尤其是钱包、括号和用户角色设定铁律。\",\n  \"action\": \"准备就绪\",\n  \"clothing\": \"无\",\n  \"location\": \"未知\",\n  \"reply\": \"(我准备好了，随时可以开始聊天。)\"\n}\n```" }
                     ];
                     
+                    // ★★★ AI VISION: Prepare messages for API, including images ★★★
                     const messagesForAPI = [
                         ...primingMessages, 
                         ...filteredHistory.map(m => {
-                            let apiContent = '';
                             const sender = m.role === 'user' ? 'user' : 'assistant';
-                            
+                            let apiContent;
+
                             let quoteContent = '';
                             if (m.replyTo) quoteContent = ` (回复 ${m.replyTo.sender}: "${m.replyTo.content}")`;
                             else if (m.aiQuote) quoteContent = ` (引用 ${m.aiQuote.sender}: "${m.aiQuote.content}")`;
-
-                            if(m.type === 'red-packet') {
+                            
+                            if (isVisionModel && m.type === 'image') {
+                                apiContent = [{ type: "text", text: `[${sender}发送了一张图片]${quoteContent}` }, { type: "image_url", image_url: { url: m.imageUrl } }];
+                            } else if (m.type === 'image') {
+                                apiContent = `[${sender}发送了一张图片，但我无法查看。]${quoteContent}`;
+                            } else if(m.type === 'red-packet') {
                                 let stateText = '';
                                 const openedCount = (m.redPacket.openers || []).length;
                                 if (openedCount === m.redPacket.count) stateText = ' (已领完)';
@@ -4228,8 +4270,7 @@
                                 if (m.transfer.received === true) stateText = ' (已收款)';
                                 else if (m.transfer.received === 'refunded') stateText = ' (已退还)';
                                 apiContent = `[${sender}进行了一笔转账: ${m.transfer.text}, 金额: ${m.transfer.amount.toFixed(2)}]${stateText}`;
-                            }
-                            else if (m.type === 'voice') apiContent = `[${sender}发送了一段语音: ${m.content}]`;
+                            } else if (m.type === 'voice') apiContent = `[${sender}发送了一段语音: ${m.content}]`;
                             else if (m.type === 'described-image') apiContent = `[${sender}发送了一张图片: ${m.content}]`;
                             else if (m.type === 'html') apiContent = `[${sender}发送了一段代码片段]`;
                             else apiContent = m.content + quoteContent;
@@ -4237,11 +4278,17 @@
                             return { role: m.role, content: apiContent };
                         })
                     ];
+                    
+                    const requestBody = { model: modelName, messages: messagesForAPI, stream: false };
+                    // For vision models, a max_tokens parameter is often useful
+                    if (isVisionModel) {
+                        requestBody.max_tokens = 4096;
+                    }
 
                     const response = await fetch(`${baseURL}/v1/chat/completions`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                        body: JSON.stringify({ model: modelName, messages: messagesForAPI, stream: false })
+                        body: JSON.stringify(requestBody)
                     });
                     if (!response.ok) { 
                         const errorData = await response.json().catch(() => ({ error: { message: '无法解析错误响应' } }));
@@ -4313,7 +4360,6 @@
                         replyText = replyText.replace(quoteRegex, '').trim();
                     }
                     
-                    // ★★★ FIX: Ensure HTML code generation works ★★★
                     const combinedRegex = /($$VOICE:(.*?)$$)|($$RED_PACKET:([^,$$]+),([^,\]]*)\])|($$TRANSFER:([^,$$]+),([^,\]]*)\])|($$IMAGE:(.*?)$$)|($$HTML:([\s\S]*?)$$)/g;
 
                     let lastIndex = 0;
@@ -4533,10 +4579,9 @@
                     
                     if (options.buttons) {
                          const buttonOrder = [...options.buttons];
-                         // ★★★ UI/UX FIX: Button order preference ★★★
                          if (options.preferredConfirmRight) {
                              const confirmIndex = buttonOrder.findIndex(b => b.class && b.class.includes('confirm'));
-                             if (confirmIndex > 0) { // If confirm is not the first one, move it to the end
+                             if (confirmIndex > 0) {
                                  const [confirmButton] = buttonOrder.splice(confirmIndex, 1);
                                  buttonOrder.push(confirmButton);
                              }
@@ -4550,17 +4595,15 @@
                             button.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 const values = {};
-                                if (options.rawHTML) {
-                                    const inputs = Array.from(modalContent.querySelectorAll('input, textarea, select'));
-                                    inputs.forEach(input => {
-                                        if (input.type === 'checkbox') {
-                                            if (!values[input.name]) values[input.name] = [];
-                                            if (input.checked) values[input.name].push(input.value);
-                                        } else {
-                                           values[input.name] = input.type === 'number' ? parseFloat(input.value) || 0 : input.value;
-                                        }
-                                    });
-                                }
+                                const formElements = Array.from(modalContent.querySelectorAll('input, textarea, select'));
+                                formElements.forEach(input => {
+                                    if (input.type === 'checkbox') {
+                                        if (!values[input.name]) values[input.name] = [];
+                                        if (input.checked) values[input.name].push(input.value);
+                                    } else {
+                                        values[input.name] = input.type === 'number' ? parseFloat(input.value) || 0 : input.value;
+                                    }
+                                });
                                 cleanup();
                                 resolve({ action: btnConfig.id, values });
                             });
@@ -4579,25 +4622,6 @@
                         });
                     }
                     
-                    if (options.isFinancial && options.modalClass === 'red-packet-modal') {
-                         const typeSelect = modalContent.querySelector('#rp-type');
-                         if(typeSelect) {
-                            const exclusiveSection = modalContent.querySelector('.modal-rp-exclusive-section');
-                            const countInput = modalContent.querySelector('#rp-count');
-                            typeSelect.addEventListener('change', () => {
-                                exclusiveSection.style.display = typeSelect.value === 'exclusive' ? 'flex' : 'none';
-                                countInput.value = typeSelect.value === 'exclusive' ? 1 : countInput.value;
-                                countInput.disabled = typeSelect.value === 'exclusive';
-                            });
-                         }
-                         const amountInput = modalContent.querySelector('#rp-amount');
-                         if(amountInput) {
-                            amountInput.addEventListener('input', e => {
-                                modalContent.querySelector('.modal-final-amount').textContent = '¥' + (parseFloat(e.target.value) || 0).toFixed(2);
-                            });
-                         }
-                    }
-
                     modalOverlay.classList.add('visible');
 
                     const handleOverlayClick = (e) => { 
@@ -4731,6 +4755,7 @@
                     if (msg.type === 'red-packet') contentToCopy = `[红包] ${msg.redPacket.text}`;
                     else if (msg.type === 'transfer') contentToCopy = `[转账] ¥${msg.transfer.amount.toFixed(2)}`;
                     else if (msg.type === 'voice') contentToCopy = `[语音] ${msg.content}`;
+                    else if (msg.type === 'image') contentToCopy = `[相册]`;
                     else if (msg.type === 'described-image') contentToCopy = `[图片] ${msg.content}`;
                     else if (msg.type === 'html') contentToCopy = msg.content;
                     else contentToCopy = msg.content;
@@ -4962,7 +4987,7 @@
                         showPhoneFrame: localStorage.getItem('showPhoneFrame')
                     };
                     const backupData = {
-                        dbVersion: 23,
+                        dbVersion: 24,
                         contacts, masks, chatHistories, settings, widgetData, favorites, worldBook, userProfile, transactions, localStorageData
                     };
                     const jsonString = JSON.stringify(backupData, null, 2);
@@ -5035,7 +5060,7 @@
                 { id: 'theme-icon', name: '主题' },
                 { id: 'forum-app-icon', name: '论坛' },
                 { id: 'worldbook-app-icon', name: '世界书' },
-                { id: 'dev1-app-icon', name: '待开发' },
+                { id: 'icity-app-icon', name: 'icity' },
                 { id: 'dev2-app-icon', name: '待开发' },
             ];
 
@@ -5103,7 +5128,7 @@
                         `;
                         groupDiv.appendChild(itemDiv);
                     });
-                    fragment.appendChild(fragment);
+                    fragment.appendChild(groupDiv);
                 }
                 favoritesList.appendChild(fragment);
             };
@@ -5458,6 +5483,7 @@
                 body.classList.remove('more-actions-visible');
             });
             
+            // ★★★ UI/UX FIX: New financial modals ★★★
             async function showTransferModal() {
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const modalHtml = `
@@ -5465,12 +5491,9 @@
                         <h3>转账给 ${getDisplayName(contact)}</h3>
                     </div>
                     <div class="modal-amount-section">
-                        <label class="modal-amount-row">
-                            <span>转账金额</span>
-                        </label>
-                        <div class="modal-amount-row" style="margin-top: 10px;">
+                        <div class="modal-amount-row">
                            <span class="currency-symbol">¥</span>
-                           <input type="number" name="amount" class="amount-input" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
+                           <input type="number" name="amount" class="amount-input" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal" autofocus>
                         </div>
                     </div>
                     <div class="modal-text-section">
@@ -5502,12 +5525,9 @@
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const isGroup = contact.type === 'group';
                 let groupOptions = '';
-                let exclusiveOption = '';
 
                 if (isGroup) {
-                    const members = allContacts.filter(c => contact.members.includes(c.contactId));
-                    const memberOptions = members.map(m => `<option value="${m.contactId}">${getDisplayName(m)}</option>`).join('');
-                    
+                    // Group options for red packet - not fully implemented in this version
                     groupOptions = `
                         <div class="modal-amount-section">
                             <div class="modal-amount-row">
@@ -5515,47 +5535,26 @@
                                 <input type="number" name="count" id="rp-count" value="1" min="1" max="${contact.members.length + 1}" style="text-align: right;" inputmode="numeric">
                                 <span>个</span>
                             </div>
-                        </div>
-                        <div class="modal-rp-type-section">
-                            <label for="rp-type">红包类型</label>
-                            <select name="type" id="rp-type">
-                                <option value="lucky">拼手气</option>
-                                <option value="normal">普通红包</option>
-                                <option value="exclusive">专属红包</option>
-                            </select>
-                        </div>`;
-                    
-                    exclusiveOption = `
-                        <div class="modal-rp-exclusive-section" style="display: none;">
-                            <label for="rp-exclusive">指定领取人</label>
-                            <select name="exclusiveTo" id="rp-exclusive">
-                                ${memberOptions}
-                            </select>
                         </div>`;
                 }
 
-
                 const modalHtml = `
-                    <div class="modal-recipient-info">
-                        <h3>发红包</h3>
-                    </div>
-                    <div class="modal-amount-section" style="border-bottom: none;">
+                    <div class="modal-amount-section" style="border-bottom: none; border-top: none; padding-top: 20px;">
                         <div class="modal-amount-row">
                             <label for="rp-amount" id="rp-amount-label">${isGroup ? '总金额' : '单个金额'}</label>
-                            <input type="number" name="totalAmount" id="rp-amount" placeholder="0.00" step="0.01" min="0.01" style="text-align: right;" inputmode="decimal">
+                            <input type="number" name="totalAmount" id="rp-amount" placeholder="0.00" step="0.01" min="0.01" style="text-align: right;" inputmode="decimal" autofocus>
                              <span>元</span>
                         </div>
                     </div>
                     ${groupOptions}
-                    ${exclusiveOption}
-                    <div class="modal-text-section">
+                    <div class="modal-text-section" style="margin-top: 10px;">
                         <textarea name="text" id="modal-red-packet-text" placeholder="恭喜发财，大吉大利！"></textarea>
                     </div>
                     <div class="modal-final-amount">¥0.00</div>
                 `;
 
                  const { action, values } = await showCustomModal({
-                    title: " ",
+                    title: "发红包",
                     isFinancial: true,
                     modalClass: 'red-packet-modal',
                     rawHTML: modalHtml,
@@ -5576,9 +5575,6 @@
                         if (values.type === 'normal' && (values.totalAmount / values.count < 0.01)) {
                              showToast('单个普通红包金额不能低于0.01元', 'warning');
                              return null;
-                        }
-                        if (values.type === 'exclusive') {
-                            values.count = 1;
                         }
                     } else {
                         values.count = 1;
@@ -5609,7 +5605,7 @@
 
             async function showDescribedImageModal() {
                  const { action, values } = await showCustomModal({
-                    title: '描述图片',
+                    title: '拍摄（描述图片）',
                     rawHTML: `<textarea name="text" class="modal-edit-textarea" placeholder="用文字来描述你想发送的图片内容..."></textarea>`,
                     buttons: [
                         {id: 'cancel', text: '取消'},
@@ -5693,9 +5689,58 @@
                         await addMessageToUI(msg);
                         clearReply();
                     }
-                } else if (['album', 'video-call', 'location', 'voice-call'].includes(action)) {
+                // ★★★ NEW FEATURE: Trigger image upload from album ★★★
+                } else if (action === 'album') {
+                    imageUploadInput.click();
+                } else if (['video-call', 'location', 'voice-call'].includes(action)) {
                      showToast('该功能正在紧张开发中，敬请期待！');
                 }
+            });
+
+            // ★★★ NEW FEATURE: Handle image upload and send ★★★
+            async function handleImageUploadAndSend(file) {
+                 if (!file) return;
+
+                const contact = await db.contacts.get({ contactId: currentChatContactId });
+                const senderId = contact.boundMaskId || 'user';
+                const isVisionModel = settings.modelName.includes('vision') || settings.modelName.includes('v');
+                
+                if (!isVisionModel) {
+                     showToast('当前模型不支持识图，请在API设置中选择Vision模型', 'warning');
+                     return;
+                }
+
+                showToast('正在处理图片...');
+                try {
+                    const options = { maxSizeMB: 1, maxWidthOrHeight: 1024, useWebWorker: true };
+                    const compressedFile = await imageCompression(file, options);
+
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        const dataUrl = event.target.result;
+                        const msg = {
+                            role: 'user',
+                            type: 'image',
+                            senderId: senderId,
+                            imageUrl: dataUrl,
+                            messageId: `msg_${Date.now()}_${Math.random()}`,
+                            timestamp: Date.now(),
+                            replyTo: replyToMessage,
+                        };
+                        await addMessageToUI(msg);
+                        clearReply();
+                        await generateResponse();
+                    };
+                    reader.readAsDataURL(compressedFile);
+                } catch (error) {
+                    showToast('图片处理失败', 'warning');
+                    console.error('Image processing error:', error);
+                }
+            }
+
+            imageUploadInput.addEventListener('change', (e) => {
+                handleImageUploadAndSend(e.target.files[0]);
+                e.target.value = ''; // Reset input
             });
 
             messageInput.addEventListener('focus', () => {
@@ -5706,6 +5751,12 @@
                 if (aiAvatar) {
                     e.stopPropagation();
                     confirmAndRegenerate();
+                    return;
+                }
+                const img = e.target.closest('.image-message-content img');
+                if (img) {
+                    // Basic image preview for now
+                    const { action } = await showCustomModal({ title: '图片预览', rawHTML: `<img src="${img.src}" style="max-width: 100%; border-radius: 8px;">`, buttons: [{id: 'close', text: '关闭', class: 'confirm'}]});
                     return;
                 }
 
@@ -5825,6 +5876,7 @@
                 if (selectedPreset) {
                     baseUrlInput.value = selectedPreset.baseURL;
                     apiKeyInput.value = selectedPreset.apiKey;
+                    modelSelect.value = selectedPreset.modelName;
                     baseUrlInput.classList.toggle('has-content', baseUrlInput.value.length > 0);
                     apiKeyInput.classList.toggle('has-content', apiKeyInput.value.length > 0);
                     showToast(`已加载预设 "${selectedPreset.name}"`);
@@ -5851,7 +5903,7 @@
 
             const showDevToast = () => showToast('该功能正在紧张开发中，敬请期待！');
             
-            [document.getElementById('tab-discover'), meMomentsBtn, meStickersBtn].forEach(btn => btn.addEventListener('click', showDevToast));
+            [document.getElementById('tab-discover'), meMomentsBtn, meStickersBtn, document.getElementById('forum-app-icon'), document.getElementById('icity-app-icon'), document.getElementById('dev2-app-icon')].forEach(btn => btn.addEventListener('click', showDevToast));
             
             meName.addEventListener('blur', saveUserData);
             meAvatar.addEventListener('click', () => meAvatarInput.click());
@@ -6030,12 +6082,12 @@
                 
                 const messageId = bubbleElement.dataset.messageId;
                 if (isSelected) {
-                    const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble');
+                    const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .image-message-content');
                     const userProfile = await db.userProfile.get('main');
                     selectedMessages.set(messageId, {
                         messageId: messageId,
                         sender: turnElement.classList.contains('user') ? (userProfile?.name || '我') : getDisplayName(contact),
-                        content: contentEl.innerText
+                        content: contentEl.innerText || '[图片]'
                     });
                 } else {
                     selectedMessages.delete(messageId);
@@ -6155,8 +6207,8 @@
                 }
             });
             async function setupReply(bubbleElement) {
-                const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble');
-                const content = contentEl.innerText;
+                const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .image-message-content');
+                const content = contentEl.innerText || '[图片]';
                 const turnElement = bubbleElement.closest('.message-turn');
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const userProfile = await db.userProfile.get('main');
@@ -6507,11 +6559,11 @@
 
                 bubbleContentEl.innerHTML = `
                     <div class="financial-content">
-                        <div class="financial-text red-packet-text">
+                        <div class="financial-text">
                             <p>${text}${exclusiveText}</p>
                         </div>
                     </div>
-                    <div class="financial-footer red-packet-footer">微信红包</div>`;
+                    <div class="financial-footer">微信红包</div>`;
                 return bubbleContentEl;
             };
 
@@ -6531,7 +6583,7 @@
                     stateText = msg.role === 'user' ? '等待对方收款' : `转账给你`;
                 }
 
-                remarkText = tr.text || '';
+                remarkText = tr.text ? `<span class="transfer-remark-inline">${tr.text}</span>` : '';
                 
                 bubbleContentEl.className = bubbleClass;
                 bubbleContentEl.innerHTML = `
@@ -6539,12 +6591,12 @@
                         <div class="financial-text">
                             <div class="transfer-main-status">
                                 <p>${stateText}</p>
-                                <span class="transfer-remark">${remarkText}</span>
+                                ${remarkText}
                             </div>
                             <span class="transfer-amount">¥${tr.amount.toFixed(2)}</span>
                         </div>
                     </div>
-                    <div class="financial-footer transfer-footer">微信转账</div>
+                    <div class="financial-footer">微信转账</div>
                 `;
                 return bubbleContentEl;
             };
@@ -6646,217 +6698,242 @@
                 const modalHtml = `
                     <div class="rp-details-header">
                         <div id="rp-sender-avatar" class="avatar"></div>
-                        <p style="font-size: 16px; margin-top: 10px;">${senderData.name} 的红包</p>
-                        <p style="font-size: 20px; color: #333; margin-top: 15px;">${rp.text}</p>
+                        <p>${senderData.name}的红包</p>
                     </div>
-                    ${myOpening ? `<div class="rp-details-amount"><span>¥${myOpening.amount.toFixed(2)}</span><p>已存入零钱，可直接消费</p></div>` : ''}
+                    <div class="rp-details-amount">
+                        ${myOpening ? `<span>¥${myOpening.amount.toFixed(2)}</span>` : ''}
+                        <p>${rp.text}</p>
+                    </div>
+                    ${openerListHtml ? `<div class="rp-details-list">${openerListHtml}</div>` : ''}
                     <div class="rp-details-status">${statusText}</div>
-                    <div class="rp-details-list">${openerListHtml}</div>
                 `;
 
-                await showCustomModal({
-                    title: "",
+                const { action } = await showCustomModal({
+                    title: " ",
                     isRPDetails: true,
                     rawHTML: modalHtml,
-                    buttons: [{id: 'close', text: '关闭'}]
+                    buttons: [{id: 'close', text: '关闭', class: 'confirm'}]
                 });
-
-                renderAvatar(document.getElementById('rp-sender-avatar'), { url: senderData.avatar, name: senderData.name, id: senderData.id });
-                const openerAvatars = document.querySelectorAll('.rp-details-list-item .avatar');
-                openerAvatars.forEach((avatarEl, i) => {
-                    const opener = openersData[i];
-                    renderAvatar(avatarEl, { url: opener.avatar, name: opener.name, id: opener.id });
+                
+                // After modal is shown, render avatars inside
+                const openerItems = modalOverlay.querySelectorAll('.rp-details-list-item');
+                openerItems.forEach((item, i) => {
+                    const avatarEl = item.querySelector('.avatar');
+                    renderAvatar(avatarEl, { name: openersData[i].name, url: openersData[i].avatar, id: rp.openers[i].userId });
                 });
+                const senderAvatarEl = modalOverlay.querySelector('#rp-sender-avatar');
+                renderAvatar(senderAvatarEl, {name: senderData.name, url: senderData.avatar, id: senderId});
             }
-            
-            async function receiveTransfer(msg) {
-                if (msg.transfer.received !== false) return;
-                if (msg.role === 'user') {
-                    showToast('你不能收取自己的转账');
-                    return;
-                }
 
+            async function receiveTransfer(msg) {
+                const tr = msg.transfer;
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const { action } = await showCustomModal({
-                    title: ``,
-                    message: `确认收取 ${getDisplayName(contact)} 的转账吗？`,
+                    title: '确认收款',
+                    message: `确定要接收来自 ${getDisplayName(contact)} 的转账 ¥${tr.amount.toFixed(2)} 吗？`,
                     buttons: [
-                        {id: 'confirm', text: '确认收款', class: 'confirm'},
-                        {id: 'refund', text: '立即退还'}
+                        {id: 'decline', text: '立即退还'},
+                        {id: 'confirm', text: '确认收款', class: 'confirm'}
                     ],
-                    buttonLayout: 'column'
+                    buttonLayout: 'row'
                 });
 
-                if (!action || action === 'cancel') return;
-                
                 if (action === 'confirm') {
-                    msg.transfer.received = true;
+                    tr.received = true;
                     await updateFinancialMessage(msg);
-                    await addUserTransaction('transfer-received', msg.transfer.amount, `收到来自 ${getDisplayName(contact)} 的转账`);
-                    showToast(`你已收款 ¥${msg.transfer.amount.toFixed(2)}`);
-                } else {
-                    msg.transfer.received = 'refunded';
+                    await addUserTransaction('transfer-received', tr.amount, `收到来自 ${getDisplayName(contact)} 的转账`);
+                    showToast(`已收款 ¥${tr.amount.toFixed(2)}`);
+                    await addMessageToUI({
+                        content: `你已收款`,
+                        senderId: 'system'
+                    }, true);
+                } else if (action === 'decline') {
+                    tr.received = 'refunded';
                     await updateFinancialMessage(msg);
-                    await addAITransaction('transfer-refund', msg.transfer.amount, contact.contactId);
-                    showToast(`你退还了转账`);
+                    await addAITransaction('transfer-refunded', tr.amount, contact.contactId);
+                    showToast('转账已退还');
+                    await addMessageToUI({
+                        content: `你退还了${getDisplayName(contact)}的转账`,
+                        senderId: 'system'
+                    }, true);
                 }
             }
             
-            async function updateFinancialMessage(updatedMsg) {
-                const contactId = updatedMsg.contactId || currentChatContactId;
-                const history = await loadChatHistory(contactId);
-                const msgIndex = history.findIndex(m => m.messageId === updatedMsg.messageId);
-                if (msgIndex > -1) {
-                    history[msgIndex] = updatedMsg;
-                    await saveChatHistory(contactId, history);
-                }
-
-                if (currentChatContactId && currentChatContactId === contactId) {
-                   await renderChatMessages(contactId);
+            async function updateFinancialMessage(msg) {
+                const history = await loadChatHistory(currentChatContactId);
+                const msgIndex = history.findIndex(m => m.messageId === msg.messageId);
+                if (msgIndex !== -1) {
+                    history[msgIndex] = msg;
+                    await saveChatHistory(currentChatContactId, history);
+                    await renderChatMessages(currentChatContactId);
                 }
             }
             
-            chatHeaderTitle.addEventListener('click', () => {
-                if(currentChatContactId) {
-                    const contact = allContacts.find(c => c.contactId === currentChatContactId);
-                    if (contact && contact.type !== 'group') {
-                        aiStatusModal.classList.add('visible');
-                    }
-                }
-            });
-            aiStatusModal.addEventListener('click', (e) => {
-                if(e.target === aiStatusModal) {
-                    aiStatusModal.classList.remove('visible');
-                }
-            });
+            async function getUserWalletBalance() {
+                const userProfile = await db.userProfile.get('main');
+                return userProfile ? (userProfile.balance || 0) : 0;
+            }
 
-            // Wallet Logic
-            const getUserWalletBalance = async () => {
-                const profile = await db.userProfile.get('main');
-                return profile?.balance || 0;
-            };
-
-            const addUserTransaction = async (type, amount, description) => {
-                const balance = await getUserWalletBalance();
-                const newBalance = balance + amount;
-                await db.userProfile.where({key:'main'}).modify({ balance: newBalance });
+            async function addUserTransaction(type, amount, description) {
+                const timestamp = Date.now();
+                const userProfile = await db.userProfile.get('main');
+                const newBalance = (userProfile.balance || 0) + amount;
+                await db.userProfile.update('main', { balance: newBalance });
                 await db.transactions.add({
-                    type, amount, description, timestamp: Date.now(),
-                    balanceAfter: newBalance, contactId: 'user'
+                    timestamp: timestamp,
+                    type: type,
+                    amount: amount,
+                    description: description,
+                    balanceAfter: newBalance,
+                    owner: 'user'
                 });
                 await renderWalletPage();
-            };
+                await renderWalletDetails();
+            }
             
-            const addAITransaction = async (type, amount, contactId) => {
+            async function addAITransaction(type, amount, contactId) {
                 const contact = await db.contacts.get({contactId: contactId});
                 if (!contact) return;
-                const balance = contact.walletBalance || 0;
-                const newBalance = balance + amount;
-                await db.contacts.where({contactId: contactId}).modify({ walletBalance: newBalance });
-            };
-
-
-            const renderWalletPage = async () => {
+                const newBalance = (contact.walletBalance || 0) + amount;
+                await db.contacts.update(contact.id, { walletBalance: newBalance });
+                // We could log AI transactions too if needed, but skipping for now to keep it simple.
+            }
+            
+            async function renderWalletPage() {
                 const balance = await getUserWalletBalance();
                 walletBalanceAmount.textContent = `¥${balance.toFixed(2)}`;
-            };
+            }
 
-            const renderWalletDetails = async () => {
-                const transactions = await db.transactions.where({contactId: 'user'}).reverse().sortBy('timestamp');
-                walletDetailsList.innerHTML = '';
-
+            async function renderWalletDetails() {
+                const transactions = await db.transactions.where({owner: 'user'}).reverse().sortBy('timestamp');
                 if (transactions.length === 0) {
-                    walletDetailsList.innerHTML = '<div style="text-align:center; padding: 50px; color: #888;">暂无明细</div>';
+                    walletDetailsList.innerHTML = '<div style="text-align: center; color: #888; padding-top: 50px;">暂无零钱明细</div>';
                     return;
                 }
 
-                const grouped = transactions.reduce((acc, t) => {
-                    const month = new Date(t.timestamp).toLocaleString('zh-CN', { year: 'numeric', month: 'long' });
-                    (acc[month] = acc[month] || []).push(t);
+                const grouped = transactions.reduce((acc, tx) => {
+                    const month = new Date(tx.timestamp).toLocaleString('default', { year: 'numeric', month: 'long' });
+                    (acc[month] = acc[month] || []).push(tx);
                     return acc;
                 }, {});
 
                 let html = '';
                 for (const month in grouped) {
-                    html += `<div class="transaction-group">
-                                <h3 class="transaction-group-header">${month}</h3>`;
-                    grouped[month].forEach(t => {
-                         html += `
+                    html += `<div class="transaction-group"><div class="transaction-group-header">${month}</div>`;
+                    grouped[month].forEach(tx => {
+                        const amountClass = tx.amount >= 0 ? 'income' : 'expense';
+                        const amountSign = tx.amount >= 0 ? '+' : '';
+                        html += `
                             <div class="transaction-item">
                                 <div class="transaction-details">
-                                    <p>${t.description}</p>
-                                    <span>${formatTimestamp(t.timestamp, 'message-datetime')}</span>
+                                    <p>${tx.description}</p>
+                                    <span>${formatTimestamp(tx.timestamp, 'message-datetime')}</span>
                                 </div>
                                 <div class="transaction-amount">
-                                    <strong class="${t.amount >= 0 ? 'income' : 'expense'}">${t.amount >= 0 ? '+' : ''}${t.amount.toFixed(2)}</strong>
-                                    <span>余额 ${t.balanceAfter.toFixed(2)}</span>
+                                    <strong class="${amountClass}">${amountSign}${tx.amount.toFixed(2)}</strong>
+                                    <span>余额: ${tx.balanceAfter.toFixed(2)}</span>
                                 </div>
                             </div>
-                         `;
+                        `;
                     });
                     html += `</div>`;
                 }
                 walletDetailsList.innerHTML = html;
-            };
-            
+            }
+
             async function checkExpiredFinancials() {
-                const allHistories = await db.chatHistories.toArray();
                 const now = Date.now();
                 const twentyFourHours = 24 * 60 * 60 * 1000;
 
-                for (const history of allHistories) {
+                // Check pending red packets from AI
+                const contactsWithPendingRPs = await db.contacts.toArray();
+                for (const contact of contactsWithPendingRPs) {
+                    const history = await loadChatHistory(contact.contactId);
                     let historyModified = false;
-                    for (const msg of history.messages) {
-                        const isExpired = now - msg.timestamp > twentyFourHours;
-                        
-                        if (isExpired && msg.type === 'red-packet' && msg.redPacket.status === 'pending') {
-                            msg.redPacket.status = 'refunded';
-                            historyModified = true;
-                             if (msg.role === 'user') {
-                                const contact = allContacts.find(c => c.contactId === history.contactId);
-                                await addUserTransaction('red-packet-refund', msg.redPacket.totalAmount, `发给 ${getDisplayName(contact)} 的红包已退还`);
-                            } else {
-                                await addAITransaction('red-packet-refund', msg.redPacket.totalAmount, msg.senderId);
-                            }
-                            await updateLastMessage(history.contactId, msg);
+                    for(const msg of history) {
+                        if (msg.role === 'assistant' && msg.type === 'red-packet' && msg.redPacket.status === 'pending' && (now - msg.timestamp > twentyFourHours)) {
+                             msg.redPacket.status = 'refunded';
+                             await addAITransaction('red-packet-refunded', msg.redPacket.totalAmount, contact.contactId);
+                             historyModified = true;
                         }
-                        
-                        if (isExpired && msg.type === 'transfer' && msg.transfer.received === false) {
+                    }
+                    if(historyModified) await saveChatHistory(contact.contactId, history);
+                }
+
+                // Check pending transfers from user
+                const contactsWithPendingTransfers = await db.contacts.toArray();
+                for (const contact of contactsWithPendingTransfers) {
+                     const history = await loadChatHistory(contact.contactId);
+                     let historyModified = false;
+                     for (const msg of history) {
+                         if (msg.role === 'user' && msg.type === 'transfer' && msg.transfer.received === false && (now - msg.timestamp > twentyFourHours)) {
                             msg.transfer.received = 'refunded';
+                            await addUserTransaction('transfer-refunded', msg.transfer.amount, `退款-来自${getDisplayName(contact)}`);
                             historyModified = true;
-                             if (msg.role === 'user') {
-                                const contact = allContacts.find(c => c.contactId === history.contactId);
-                                await addUserTransaction('transfer-refund', msg.transfer.amount, `发给 ${getDisplayName(contact)} 的转账已退还`);
-                            } else {
-                                await addAITransaction('transfer-refund', msg.transfer.amount, msg.senderId);
-                            }
-                            await updateLastMessage(history.contactId, msg);
-                        }
-                    }
-                    if (historyModified) {
-                        await saveChatHistory(history.contactId, history.messages);
-                    }
+                         }
+                     }
+                     if(historyModified) await saveChatHistory(contact.contactId, history);
                 }
             }
 
-            // ★★★ NEW FEATURE: Change Chat Avatars Logic ★★★
+
+            // Event Listeners
+            modalOverlay.addEventListener('keyup', (e) => {
+                if (e.target.matches('.financial-modal-body .amount-input')) {
+                    const amount = parseFloat(e.target.value) || 0;
+                    const finalAmountEl = modalOverlay.querySelector('.modal-final-amount');
+                    if (finalAmountEl) {
+                        finalAmountEl.textContent = `¥${amount.toFixed(2)}`;
+                    }
+                }
+            });
+            modalOverlay.addEventListener('input', (e) => {
+                if (e.target.matches('.financial-modal-body .amount-input')) {
+                    const amount = parseFloat(e.target.value) || 0;
+                    const finalAmountEl = modalOverlay.querySelector('.modal-final-amount');
+                    if (finalAmountEl) {
+                        finalAmountEl.textContent = `¥${amount.toFixed(2)}`;
+                    }
+                }
+            });
+            
+            aiStatusModal.addEventListener('click', (e) => {
+                if(e.target === aiStatusModal) {
+                    aiStatusModal.classList.remove('visible');
+                }
+            });
+            chatHeaderTitle.addEventListener('click', () => {
+                if (body.classList.contains('chat-view-active')) {
+                    aiStatusModal.classList.add('visible');
+                }
+            });
+
             changeChatAvatarsBtn.addEventListener('click', async () => {
                 if (!currentChatContactId) return;
+                
                 const contact = await db.contacts.get({contactId: currentChatContactId});
+                const chatSpecificAvatars = contact.chatSpecificAvatars || {};
                 
-                const myCurrentAvatar = contact.chatSpecificAvatars?.user || (await db.userProfile.get('main'))?.avatar;
-                const aiCurrentAvatar = contact.chatSpecificAvatars?.assistant || contact.avatar;
-                
+                let myAvatarPreview = chatSpecificAvatars.user || '';
+                const mask = contact.boundMaskId ? await db.masks.get({maskId: contact.boundMaskId}) : null;
+                const profile = await db.userProfile.get('main');
+                const myDefaultName = mask ? mask.name : (profile.name || '我');
+
+                let theirAvatarPreview = chatSpecificAvatars.assistant || contact.avatar || '';
+                const theirDefaultName = getDisplayName(contact);
+
                 const modalHtml = `
-                    <div style="display: flex; justify-content: space-around; align-items: center; padding: 20px 0;">
+                    <div style="display: flex; justify-content: space-around; padding: 20px;">
                         <div class="avatar-uploader" data-target="user">
-                            <div class="avatar-preview" style="background-image: url(${myCurrentAvatar || ''})"></div>
-                            <span>换我的头像</span>
+                            <div class="avatar-preview" style="width: 80px; height: 80px; border-radius: 8px; background-image: url(${myAvatarPreview}); background-size: cover; background-color: #e0e0e0; margin-bottom: 10px;"></div>
+                            <span style="font-size: 14px; color: #888;">${myDefaultName}</span>
+                            <span class="change-avatar-text" style="color: var(--ios-blue); margin-top: 5px;">换我的头像</span>
                             <input type="file" accept="image/*" style="display: none;">
                         </div>
                         <div class="avatar-uploader" data-target="assistant">
-                            <div class="avatar-preview" style="background-image: url(${aiCurrentAvatar || ''})"></div>
-                            <span>换TA的头像</span>
+                            <div class="avatar-preview" style="width: 80px; height: 80px; border-radius: 8px; background-image: url(${theirAvatarPreview}); background-size: cover; background-color: #e0e0e0; margin-bottom: 10px;"></div>
+                            <span style="font-size: 14px; color: #888;">${theirDefaultName}</span>
+                            <span class="change-avatar-text" style="color: var(--ios-blue); margin-top: 5px;">换TA的头像</span>
                             <input type="file" accept="image/*" style="display: none;">
                         </div>
                     </div>
@@ -6871,7 +6948,6 @@
                     buttons: [{id: 'close', text: '关闭', class: 'confirm'}]
                 });
 
-                // If the modal is closed, refresh views to reflect any changes
                 if (action === 'close') {
                     await renderChatSettingsPage();
                     await renderChatMessages(currentChatContactId);
@@ -6879,7 +6955,6 @@
                 }
             });
             
-            // Event delegation for the avatar change modal
             modalOverlay.addEventListener('click', e => {
                 const uploader = e.target.closest('.avatar-uploader');
                 if (uploader) {
@@ -6890,7 +6965,6 @@
                     e.target.disabled = true;
                     db.contacts.where({contactId: currentChatContactId}).modify({ chatSpecificAvatars: {} }).then(() => {
                         showToast('已恢复默认头像');
-                        // Reset preview in the modal
                         const previews = modalOverlay.querySelectorAll('.avatar-preview');
                         previews.forEach(p => p.style.backgroundImage = '');
                         e.target.disabled = false;
@@ -6905,7 +6979,7 @@
                     if (!file) return;
 
                     const uploader = input.closest('.avatar-uploader');
-                    const target = uploader.dataset.target; // 'user' or 'assistant'
+                    const target = uploader.dataset.target;
                     const previewEl = uploader.querySelector('.avatar-preview');
 
                     imageCompression(file, { maxSizeMB: 0.2, maxWidthOrHeight: 400 })
@@ -6929,7 +7003,7 @@
                             console.error(err);
                         })
                         .finally(() => {
-                            input.value = ''; // Reset file input
+                            input.value = '';
                         });
                 }
             });
