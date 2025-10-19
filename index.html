@@ -504,6 +504,7 @@
 
         body.edit-contact-active #contacts-page,
         body.edit-contact-active #chat-settings-page,
+        body.edit-contact-active #wechat-main-page,
         body.chat-view-active[data-main-tab="messages"] #wechat-main-page,
         body.chat-view-active[data-main-tab="contacts"] #contacts-page,
         body.chat-settings-active #chat-page,
@@ -521,16 +522,7 @@
             transition: transform 0.3s ease-in-out;
         }
         
-        body:not([data-main-tab]) .wechat-tab-bar,
-        body.chat-view-active .wechat-tab-bar,
-        body.chat-settings-active .wechat-tab-bar,
-        body.edit-contact-active .wechat-tab-bar,
-        body.edit-mask-active .wechat-tab-bar,
-        body.my-masks-active .wechat-tab-bar,
-        body.mask-selection-active .wechat-tab-bar,
-        body.wallet-active .wechat-tab-bar,
-        body.wallet-details-active .wechat-tab-bar,
-        body.worldbook-binding-active .wechat-tab-bar {
+        body:not([data-main-tab]) .wechat-tab-bar {
             display: none;
         }
 
@@ -804,7 +796,7 @@
 
         .message-content { 
             padding: 10px 14px; 
-            border-radius: 8px; 
+            border-radius: 8px; _
             font-size: 14px;
             line-height: 1.4; 
             word-wrap: break-word; 
@@ -814,22 +806,22 @@
         .message-turn.user .message-content { background-color: var(--user-bubble-green); color: var(--text-dark); }
         .message-turn.assistant .message-content { background-color: #FFF; color: var(--text-dark); }
         
+        /* ★★★ UI FIX: Style for HTML code blocks ★★★ */
         .html-message-content {
-            width: 100%;
-            max-width: 500px;
+            width: auto;
+            max-width: 280px; /* Adjust max width as needed */
+            height: auto;
             background-color: #FFF;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--ios-border-color);
-            max-height: 400px;
         }
         .html-message-content iframe {
             width: 100%;
-            height: 100%;
+            height: auto; /* Let height be determined by JS */
             border: none;
-            display: block; /* Fix for potential iframe spacing */
+            display: block;
         }
-
 
         .loading-indicator { font-style: italic; color: #888; align-self: flex-start; margin-left: 50px; font-size: 14px; }
 
@@ -1791,7 +1783,7 @@
         .red-packet-bubble, .transfer-bubble {
             border-radius: 8px;
             padding: 0;
-            width: 240px;
+            width: 240px; /* UI FIX: Reduced width */
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
@@ -1816,7 +1808,12 @@
             padding: 15px 20px;
         }
         .red-packet-bubble .financial-content {
-            padding: 20px 20px;
+            padding: 20px 20px; /* UI FIX: Increased vertical padding */
+        }
+        
+        /* ★★★ UI FIX: Adjust padding for transfer bubble after icon removal ★★★ */
+        .transfer-bubble .financial-content {
+            padding: 15px 20px;
         }
 
         .financial-text { flex-grow: 1; overflow: hidden; }
@@ -2267,16 +2264,10 @@
             overflow-y: auto;
             border-radius: 5px;
         }
-        .described-image-text::-webkit-scrollbar {
-            width: 4px;
-        }
-        .described-image-text::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 2px;
-        }
         .described-image-bubble.show-text .described-image-text {
             opacity: 1;
         }
+
     </style>
 </head>
 <body class="app-is-closed">
@@ -3234,7 +3225,8 @@
             const navigateTo = async (page) => {
                 const pageClasses = ['edit-contact-active', 'chat-view-active', 'chat-settings-active', 'main-settings-active', 'theme-settings-active', 'my-masks-active', 'edit-mask-active', 'mask-selection-active', 'api-config-active', 'data-management-active', 'favorites-active', 'wallet-active', 'wallet-details-active', 'worldbook-active', 'worldbook-binding-active', 'worldbook-edit-active'];
                 pageClasses.forEach(cls => body.classList.remove(cls));
-
+                
+                // ★★★ LOGIC FIX: Force render chat settings page when navigating to it ★★★
                 if (page === 'chat-settings-active') {
                     await renderChatSettingsPage();
                 }
@@ -3247,7 +3239,8 @@
                     body.removeAttribute('data-main-tab');
                     body.classList.add(page);
                 } else {
-                    body.removeAttribute('data-main-tab');
+                    body.setAttribute('data-main-tab', 'messages');
+                    document.querySelectorAll('.page').forEach(p => p.style.transform = '');
                 }
 
                 document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
@@ -3427,16 +3420,10 @@
                 if (history && Array.isArray(history.messages)) {
                     return history.messages;
                 }
-                await saveChatHistory(contactId, []);
                 return [];
             };
-
             const saveChatHistory = async (contactId, messages) => {
-                if (!contactId || !Array.isArray(messages)) {
-                    console.error('Invalid call to saveChatHistory:', { contactId, messages });
-                    return;
-                }
-                await db.chatHistories.put({ contactId, messages });
+                await db.chatHistories.put({ contactId: contactId, messages: messages });
             };
             const loadApiSettings = async () => {
                 const savedSettings = await db.settings.get('apiSettings');
@@ -3513,8 +3500,9 @@
                     }
 
                     let previewHTML = contact.lastMessageContent || '';
-                    previewHTML = previewHTML.replace(/\[(红包|转账|语音|图片|聊天记录|代码片段)\]/g, '[$1]');
-
+                    if (previewHTML.includes('[红包]')) {
+                        previewHTML = previewHTML.replace('[红包]', ' ');
+                    }
 
                     item.innerHTML = `
                         ${avatarHTML}
@@ -3773,10 +3761,6 @@
                     messageElement.addEventListener('click', () => handleFinancialMessageClick(messageElement, msg));
                 } else if (msg.type === 'voice') {
                     messageElement.addEventListener('click', () => toggleVoiceText(bubbleEl));
-                } else if (msg.type === 'html') {
-                    // For HTML messages, the long press is on the messageElement itself
-                } else {
-                    // For other bubble-wrapped messages
                 }
                 
                 addLongPressListener(messageElement);
@@ -3830,7 +3814,7 @@
                 timeSensingToggle.checked = !!contact.isTimeSensingEnabled;
                 
                 if (contact.boundMaskId) {
-                    const mask = await db.masks.get({ maskId: contact.boundMaskId });
+                    const mask = await db.masks.get({maskId: contact.boundMaskId});
                     boundMaskName.textContent = mask ? mask.name : '已失效';
                 } else {
                     boundMaskName.textContent = '未绑定';
@@ -3927,34 +3911,27 @@
             const createHtmlMessageElement = (msg) => {
                 const contentEl = document.createElement('div');
                 contentEl.className = 'html-message-content';
-
+            
                 const iframe = document.createElement('iframe');
-                iframe.sandbox = 'allow-scripts allow-same-origin';
+                iframe.sandbox = 'allow-scripts';
                 contentEl.appendChild(iframe);
                 
-                const iframeContent = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <style>
-                            body { 
-                                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-                                font-size: 14px;
-                                margin: 0;
-                                padding: 8px;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${msg.content}
-                    </body>
-                    </html>
-                `;
-
+                // Use a slight delay to ensure the iframe is in the DOM
                 setTimeout(() => {
-                    if (iframe.contentWindow) {
-                        iframe.srcdoc = iframeContent;
-                    }
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    // Inject a style to make the font smaller and body margin 0
+                    doc.write(`
+                        <style>
+                            body { margin: 0; font-family: monospace; font-size: 12px; line-height: 1.4; }
+                            pre { margin: 0; padding: 10px; }
+                        </style>
+                        <pre><code>${msg.content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></pre>
+                    `);
+                    doc.close();
+                    
+                    // Adjust iframe height to fit its content
+                    iframe.style.height = doc.body.scrollHeight + 'px';
                 }, 100);
 
                 return contentEl;
@@ -4086,8 +4063,8 @@
                     const actionRule = "`action`: (string) 角色此时此刻的、一个细微的、不为人知的动作或状态。这部分用户也看不到，但必须填写。";
                     const clothingRule = "`clothing`: (string) 角色当前穿着的详细描述。此部分内容在一般聊天中用户不可见，但必须根据情景、天气或故事背景进行合理想象并填写。如果角色设定（如非人形）导致没有穿着，则填写“无”。";
                     const replyRule = "`reply`: (string) 你作为角色要发送给用户的最终消息。这条消息本身必须遵循下述的【括号铁律 - 最高优先级命令】。";
-                    const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用英文括号 () 包围】，并且括号及其中的内容【必须作为一条完整的、不可分割的消息单元】，绝不允许将前半个括号和后半个括号拆分到不同的消息中。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。一个括号内的描述本身就可以构成一条完整的`reply`消息。此规则不适用于代码等技术性内容中的括号，如 `console.log()`。";
-                    const scenarioRule = "【场景切换规则】默认情况下，你处于【模拟线下场景】。但如果用户提出的是一个纯粹的、需要直接、客观回答的【知识性或指令性问题】（例如：“鲁迅和周树人是什么关系？”或“帮我写一段代码”），你必须临时切换到【线上聊天场景】。在此场景下，你的`reply`字段中【不应】包含描述共享环境的文字，但【仍然必须】遵守【括号铁律】，使用括号 `()` 描述你自己的动作或神态。完成回答后，你应在下一次互动中自动恢复到【模拟线下场景】。";
+                    const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用英文括号 () 包围】。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。一个括号内的描述本身就可以构成一条完整的`reply`消息，后面不一定需要跟随对话文字。例如，`reply`的值可以是 \"(低头看了看手机)\"。这是一个不可违背的规则。";
+                    const scenarioRule = "【场景切换规则】默认情况下，你处于【模拟线下场景】。但如果用户提出的是一个纯粹的、需要直接、客观回答的【知识性或指令性问题】（例如：“鲁迅和周树人是什么关系？”或“帮我写一段代码”），你必须临时切换到【线上聊天场景】。在此场景下，你的`reply`字段中【不应】包含描述共享环境的文字，但【仍然必须】遵守【括号铁律】，使用括号 `()` 描述你自己的动作或神态（例如：(笑了笑) 鲁迅和周树人是同一个人。）。完成回答后，你应在下一次互动中自动恢复到【模拟线下场景】。";
                     const priorityRule = "【知识优先级】你必须优先使用你的核心【角色设定】中的信息。当【世界设定书】中的信息与你的核心设定冲突时，以你的核心设定为准。世界设定书是你记忆的补充，而不是替代。";
                     
                     const aiWalletBalance = contact.walletBalance || 0;
@@ -4288,7 +4265,7 @@
                         } else if (trFull) {
                              processQueue.push({ type: 'transfer', amount: parseFloat(trAmount) || 0, text: (trText || '').trim() });
                         } else if (imgFull) {
-                             processQueue.push({ type: 'described-image', content: `(${ (imgDesc || '').trim() })` });
+                             processQueue.push({ type: 'described-image', content: (imgDesc || '').trim() });
                         } else if (htmlFull) {
                             processQueue.push({ type: 'html', content: (htmlContent || '').trim() });
                         }
@@ -4617,17 +4594,14 @@
                 
                 const firstChildBubble = bubbleElement.children[0];
                 const isVoiceMessage = firstChildBubble && firstChildBubble.classList.contains('voice-message-bubble');
-                const isHtmlMessage = firstChildBubble && firstChildBubble.classList.contains('html-message-content');
 
 
                 let menuItems = `
                     <div class="context-menu-item" data-action="copy">复制</div>
                     <div class="context-menu-item" data-action="favorite">收藏</div>
                     <div class="context-menu-item" data-action="delete">删除</div>
+                    <div class="context-menu-item" data-action="edit">编辑</div>
                 `;
-                if (!isHtmlMessage) {
-                    menuItems += `<div class="context-menu-item" data-action="edit">编辑</div>`;
-                }
                 if (isUserMessage) {
                     menuItems += `<div class="context-menu-item" data-action="recall">撤回</div>`;
                 }
@@ -4878,6 +4852,7 @@
                 unbindItem.addEventListener('click', async () => {
                     await db.contacts.where({contactId: currentChatContactId}).modify({ boundMaskId: null });
                     showToast('已解除绑定');
+                    // ★★★ LOGIC FIX: Force render chat settings after action ★★★
                     navigateTo('chat-settings-active');
                 });
                 maskSelectionList.appendChild(unbindItem);
@@ -4886,7 +4861,6 @@
                     allMasks.forEach(mask => {
                         const item = document.createElement('div');
                         item.className = 'mask-selection-item';
-                        item.dataset.maskId = mask.maskId;
                         item.innerHTML = `
                             <div class="mask-avatar" style="background-image: url(${mask.avatar || ''})">${!mask.avatar ? defaultMaskAvatar : ''}</div>
                             <div class="mask-name">${mask.name}</div>
@@ -4894,6 +4868,7 @@
                         item.addEventListener('click', async () => {
                             await db.contacts.where({contactId: currentChatContactId}).modify({ boundMaskId: mask.maskId });
                             showToast(`已绑定面具: ${mask.name}`);
+                            // ★★★ LOGIC FIX: Force render chat settings after action ★★★
                             navigateTo('chat-settings-active');
                         });
                         maskSelectionList.appendChild(item);
@@ -5576,7 +5551,7 @@
                 });
 
                 if (action === 'confirm' && values.text.trim()) {
-                    return `(${values.text.trim()})`;
+                    return values.text.trim();
                 }
                 return null;
             }
@@ -5985,12 +5960,12 @@
                 
                 const messageId = bubbleElement.dataset.messageId;
                 if (isSelected) {
-                    const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .html-message-content');
+                    const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble');
                     const userProfile = await db.userProfile.get('main');
                     selectedMessages.set(messageId, {
                         messageId: messageId,
                         sender: turnElement.classList.contains('user') ? (userProfile?.name || '我') : getDisplayName(contact),
-                        content: contentEl.innerText || '[代码片段]'
+                        content: contentEl.innerText
                     });
                 } else {
                     selectedMessages.delete(messageId);
@@ -6110,8 +6085,8 @@
                 }
             });
             async function setupReply(bubbleElement) {
-                const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .html-message-content');
-                const content = (contentEl.innerText || '[代码片段]').trim();
+                const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble');
+                const content = contentEl.innerText;
                 const turnElement = bubbleElement.closest('.message-turn');
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const userProfile = await db.userProfile.get('main');
@@ -6474,7 +6449,6 @@
                 const tr = msg.transfer;
                 const bubbleContentEl = document.createElement('div');
                 let stateText, remarkText, bubbleClass;
-                const contact = await db.contacts.get({contactId: currentChatContactId});
                 
                 bubbleClass = 'transfer-bubble';
                 if (tr.received === true) {
@@ -6492,7 +6466,6 @@
                 bubbleContentEl.className = bubbleClass;
                 bubbleContentEl.innerHTML = `
                     <div class="financial-content">
-                        <svg viewBox="0 0 1024 1024" fill="currentColor" width="32" height="32" style="margin-right: 12px; flex-shrink: 0;"><path d="M720 384H304a32 32 0 1 0 0 64h416a32 32 0 1 0 0-64zM304 576h176a32 32 0 1 0 0-64H304a32 32 0 1 0 0 64z"></path><path d="M880 112H144a32 32 0 0 0-32 32v736a32 32 0 0 0 32 32h736a32 32 0 0 0 32-32V144a32 32 0 0 0-32-32zm-32 736H176V176h672v672z"></path></svg>
                         <div class="financial-text">
                             <div class="transfer-main-status">
                                 <p>${stateText}</p>
@@ -6661,14 +6634,13 @@
             
             async function updateFinancialMessage(updatedMsg) {
                 const contactId = updatedMsg.contactId || currentChatContactId;
-                const history = await db.chatHistories.get(contactId);
-                if (history && history.messages) {
-                    const msgIndex = history.messages.findIndex(m => m.messageId === updatedMsg.messageId);
-                    if (msgIndex > -1) {
-                        history.messages[msgIndex] = updatedMsg;
-                        await saveChatHistory(contactId, history.messages);
-                    }
+                const history = await loadChatHistory(contactId);
+                const msgIndex = history.findIndex(m => m.messageId === updatedMsg.messageId);
+                if (msgIndex > -1) {
+                    history[msgIndex] = updatedMsg;
+                    await saveChatHistory(contactId, history);
                 }
+
                 if (currentChatContactId && currentChatContactId === contactId) {
                    await renderChatMessages(contactId);
                 }
@@ -6902,7 +6874,6 @@
                 updateTime();
                 setInterval(updateTime, 1000 * 60);
                 messageInput.dispatchEvent(new Event('input')); 
-                navigateTo('messages');
             };
 
             init();
