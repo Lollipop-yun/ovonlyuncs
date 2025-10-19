@@ -502,12 +502,12 @@
             background-color: var(--ios-system-gray);
         }
 
+        /* ★★★ UI/UX FIX: Smoother transition for chat settings ★★★ */
         body.edit-contact-active #contacts-page,
         body.edit-contact-active #chat-settings-page,
         body.edit-contact-active #wechat-main-page,
         body.chat-view-active[data-main-tab="messages"] #wechat-main-page,
         body.chat-view-active[data-main-tab="contacts"] #contacts-page,
-        body.chat-settings-active #chat-page,
         body.my-masks-active #me-page,
         body.edit-mask-active #my-masks-page,
         body.mask-selection-active #chat-settings-page,
@@ -520,6 +520,11 @@
         body.worldbook-edit-active #worldbook-page {
             transform: translateX(-30%);
             transition: transform 0.3s ease-in-out;
+        }
+        /* The chat page no longer moves when settings open */
+        body.chat-settings-active #chat-page {
+            transform: translateX(0); /* Stays put */
+            filter: brightness(0.95);
         }
         
         body:not([data-main-tab]) .wechat-tab-bar {
@@ -796,7 +801,7 @@
 
         .message-content { 
             padding: 10px 14px; 
-            border-radius: 8px;
+            border-radius: 8px; 
             font-size: 14px;
             line-height: 1.4; 
             word-wrap: break-word; 
@@ -808,7 +813,7 @@
         
         .html-message-content {
             width: auto;
-            max-width: 280px;
+            max-width: 280px; 
             height: auto;
             background-color: #FFF;
             border-radius: 8px;
@@ -1782,7 +1787,7 @@
         .red-packet-bubble, .transfer-bubble {
             border-radius: 8px;
             padding: 0;
-            width: 240px;
+            width: 230px;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s;
@@ -1804,14 +1809,15 @@
         .financial-content {
             display: flex;
             align-items: center;
-            padding: 15px 20px;
-        }
-        .red-packet-bubble .financial-content {
-            padding: 20px 20px;
+            padding: 15px 15px;
         }
         
-        .transfer-bubble .financial-content {
-            padding: 15px 20px;
+        /* ★★★ UI/UX FIX: Remove red packet icon and adjust padding ★★★ */
+        .red-packet-bubble .financial-content svg {
+             display: none; 
+        }
+        .red-packet-bubble .financial-content {
+            padding: 15px 15px; /* Adjust padding to be consistent */
         }
 
         .financial-text { flex-grow: 1; overflow: hidden; }
@@ -1932,6 +1938,7 @@
             font-weight: 300;
             margin-right: 15px;
         }
+        /* ★★★ UI/UX FIX: Ensure financial inputs are treated as native text inputs for better mobile keyboard behavior ★★★ */
         .financial-modal-body .modal-amount-section input,
         .financial-modal-body .modal-text-section input,
         .financial-modal-body .modal-text-section textarea,
@@ -1944,6 +1951,9 @@
             font-size: 16px;
             padding: 5px 0;
             font-family: inherit;
+            /* This helps mobile browsers treat it as a standard text field */
+            -webkit-user-select: text; 
+            user-select: text;
         }
         #modal-red-packet-text { height: 60px; resize: none; }
         .financial-modal-body .modal-amount-section .amount-input { font-size: 30px; font-weight: 500; }
@@ -2710,11 +2720,8 @@
                     <header id="chat-page-header" class="header">
                         <button id="back-to-list-btn" class="header-btn left" title="返回"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg></button>
                         <h1 id="chat-header-title" class="header-title">AI 助手</h1>
-                        <div class="header-btn-group">
-                            <button id="swap-avatars-btn" class="header-btn" title="互换头像"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg></button>
-                            <button id="cancel-multi-select-btn" class="header-btn right" style="display: none;">取消</button>
-                            <button id="to-settings-btn" class="header-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg></button>
-                        </div>
+                        <button id="cancel-multi-select-btn" class="header-btn right" style="display: none;">取消</button>
+                        <button id="to-settings-btn" class="header-btn right"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" /></svg></button>
                     </header>
                     <main id="chat-messages" class="chat-messages"></main>
                 </div>
@@ -2748,12 +2755,9 @@
                                 <span class="settings-action-label">设置当前聊天背景</span>
                                 <span class="settings-action-arrow">&gt;</span>
                             </div>
-                            <div id="set-remark-btn" class="settings-action-item">
-                                <span class="settings-action-label">设置备注</span>
-                                <span class="settings-action-arrow">&gt;</span>
-                            </div>
-                            <div id="edit-contact-info-btn" class="settings-action-item">
-                                <span class="settings-action-label">编辑信息</span>
+                            <!-- ★★★ NEW FEATURE: Change Chat Avatars ★★★ -->
+                            <div id="change-chat-avatars-btn" class="settings-action-item">
+                                <span class="settings-action-label">更换聊天头像</span>
                                 <span class="settings-action-arrow">&gt;</span>
                             </div>
                         </div>
@@ -2773,6 +2777,16 @@
                                     <span id="bound-worldbook-value" class="settings-action-value">未绑定</span>
                                     <span class="settings-action-arrow">&gt;</span>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="settings-group">
+                            <div id="set-remark-btn" class="settings-action-item">
+                                <span class="settings-action-label">设置备注和标签</span>
+                                <span class="settings-action-arrow">&gt;</span>
+                            </div>
+                            <div id="edit-contact-info-btn" class="settings-action-item">
+                                <span class="settings-action-label">编辑AI设定</span>
+                                <span class="settings-action-arrow">&gt;</span>
                             </div>
                         </div>
                         <div class="settings-group">
@@ -2868,7 +2882,7 @@
                     <div>消息</div>
                 </div>
                 <div id="tab-contacts" class="tab-item">
-                    <svg viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><path d="M9 3a4 4 0 0 1 0 8a4 4 0 0 1 0-8z" /><path d="M23 20v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    <svg viewBox="0 0 24 24"><path d="M17 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><path d="M9 3a4 4 0 0 1 0 8a4 4 0 0 1 0-8z" /><path d="M23 20v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75"/svg>
                     <div>通讯录</div>
                 </div>
                 <div id="tab-discover" class="tab-item">
@@ -2923,7 +2937,8 @@
                 <p id="ai-status-action">(暂无)</p>
                 <h4>此刻的穿着</h4>
                 <p id="ai-status-clothing">(暂无)</p>
-                <h4>目前的位置</h4>
+                <!-- ★★★ NEW FEATURE: AI Location ★★★ -->
+                <h4>此刻的位置</h4>
                 <p id="ai-status-location">(暂无)</p>
             </div>
         </div>
@@ -2934,7 +2949,7 @@
             const db = new Dexie('WeChatDB');
             
             db.version(23).stores({
-                contacts: '++id, &contactId, name, type, members, remark, isPinned, isTimeSensingEnabled, lastMessageTimestamp, lastMessageContent, boundMaskId, *boundWorldBookFolders, chatBackground, lastAiThoughts, lastAiAction, lastAiClothing, lastAiLocation, walletBalance, isAvatarSwapped',
+                contacts: '++id, &contactId, name, type, members, remark, isPinned, isTimeSensingEnabled, lastMessageTimestamp, lastMessageContent, boundMaskId, *boundWorldBookFolders, chatBackground, lastAiThoughts, lastAiAction, lastAiClothing, lastAiLocation, walletBalance, chatSpecificAvatars',
                 chatHistories: '&contactId, messages',
                 settings: '&key, data',
                 masks: '++id, &maskId, name, story, gender, avatar',
@@ -2943,6 +2958,11 @@
                 worldBook: '++id, type, name, folderId, content',
                 userProfile: '&key, value',
                 transactions: '++id, timestamp, type, contactId'
+            }).upgrade(tx => {
+                return tx.table('contacts').toCollection().modify(contact => {
+                    if (contact.lastAiLocation === undefined) contact.lastAiLocation = '';
+                    if (contact.chatSpecificAvatars === undefined) contact.chatSpecificAvatars = {};
+                });
             });
 
             // Element Selectors
@@ -3131,7 +3151,7 @@
             const backToWalletBtn = document.getElementById('back-to-wallet-btn');
             const walletDetailsList = document.getElementById('wallet-details-list');
 
-            const swapAvatarsBtn = document.getElementById('swap-avatars-btn');
+            const changeChatAvatarsBtn = document.getElementById('change-chat-avatars-btn');
 
             // State variables
             let currentChatContactId = null;
@@ -3175,7 +3195,27 @@
                 const timeString = `${hours}:${minutes}`;
                 statusBarTime.textContent = timeString;
                 widgetTime.textContent = timeString;
-                batteryLevel.style.width = `${now.getSeconds() / 59 * 100}%`;
+            };
+            
+            // ★★★ NEW FEATURE: Real Battery Sync ★★★
+            const updateBattery = async () => {
+                try {
+                    if ('getBattery' in navigator) {
+                        const battery = await navigator.getBattery();
+                        const level = battery.level * 100;
+                        batteryLevel.style.width = `${level}%`;
+                        if (battery.charging) {
+                             batteryLevel.style.backgroundColor = 'var(--wechat-green)';
+                        } else {
+                             batteryLevel.style.backgroundColor = 'currentColor';
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Could not access Battery API.", e);
+                    // Fallback to time-based simulation
+                    const now = new Date();
+                    batteryLevel.style.width = `${(60 - now.getSeconds()) / 60 * 100}%`;
+                }
             };
 
             const updateDate = () => {
@@ -3256,15 +3296,16 @@
                  if (userId === 'user') {
                     const profile = await db.userProfile.get('main');
                     return {
+                        id: 'user',
                         name: profile?.name || '我',
                         avatar: profile?.avatar
                     }
                 }
                 const contact = await db.contacts.get({contactId: userId});
-                if(contact) return { name: getDisplayName(contact), avatar: contact.avatar };
+                if(contact) return { id: contact.id, contactId: contact.contactId, name: getDisplayName(contact), avatar: contact.avatar };
 
                 const mask = await db.masks.get({maskId: userId});
-                if(mask) return { name: mask.name, avatar: mask.avatar };
+                if(mask) return { id: mask.id, maskId: mask.maskId, name: mask.name, avatar: mask.avatar };
 
                 return {name: '未知用户', avatar: null};
             };
@@ -3276,24 +3317,24 @@
                 return `<div class="avatar" style="background-color: ${color};">${firstChar}</div>`;
             };
 
-            const renderAvatar = (element, contact) => {
+            const renderAvatar = (element, avatarData, defaultAvatarContent = '?') => {
                 if (!element) return;
-                if (contact && contact.avatar) {
-                    element.style.backgroundImage = `url(${contact.avatar})`;
+                
+                if (avatarData && avatarData.url) {
+                    element.style.backgroundImage = `url(${avatarData.url})`;
                     element.style.backgroundColor = 'transparent';
                     element.innerHTML = '';
-                } else if (contact) {
+                } else if (avatarData && avatarData.name) {
                     element.style.backgroundImage = '';
-                    const firstChar = (contact.remark || contact.name || '?').charAt(0).toUpperCase();
-                    const contactId = contact.contactId || '';
-                    const charCode = contactId ? contactId.charCodeAt(contactId.length - 1) : 0;
+                    const firstChar = avatarData.name.charAt(0).toUpperCase();
+                    const charCode = avatarData.id ? String(avatarData.id).charCodeAt(String(avatarData.id).length - 1) : 0;
                     const color = avatarColors[charCode % avatarColors.length];
                     element.style.backgroundColor = color;
                     element.textContent = firstChar;
                 } else {
                      element.style.backgroundImage = '';
                      element.style.backgroundColor = '#ccc';
-                     element.textContent = '?';
+                     element.textContent = defaultAvatarContent;
                 }
             };
 
@@ -3336,7 +3377,7 @@
                 contactEditorReturnPath = returnPath;
                 tempAvatarDataUrl = contact ? contact.avatar : null;
                 
-                editContactTitle.textContent = contact ? '编辑信息' : '添加朋友';
+                editContactTitle.textContent = contact ? '编辑AI设定' : '添加朋友';
                 saveContactBtn.textContent = contact ? '完成' : '保存';
                 
                 contactNameInput.value = contact ? contact.name : '';
@@ -3400,7 +3441,7 @@
                             lastAiClothing: '',
                             lastAiLocation: '',
                             walletBalance: 0,
-                            isAvatarSwapped: false,
+                            chatSpecificAvatars: {},
                         });
                         await db.contacts.add(contactData);
                         showToast('好友已添加');
@@ -3490,27 +3531,29 @@
                         item.classList.add('pinned');
                     }
                     
+                    const chatSpecificAvatars = contact.chatSpecificAvatars || {};
+                    const aiAvatar = chatSpecificAvatars.assistant || contact.avatar;
+                    const aiName = getDisplayName(contact);
+
                     let avatarHTML = '';
                     if (contact.type === 'group') {
                         avatarHTML = `<div class="chat-list-avatar" style="background-color: #ddd;">${defaultGroupAvatar}</div>`;
                     } else {
-                        if (contact.avatar) {
-                           avatarHTML = `<div class="chat-list-avatar avatar" style="background-image: url(${contact.avatar})"></div>`;
+                        if (aiAvatar) {
+                           avatarHTML = `<div class="chat-list-avatar avatar" style="background-image: url(${aiAvatar})"></div>`;
                         } else {
-                           avatarHTML = generateTextAvatar(getDisplayName(contact), contact.contactId).replace('class="avatar"', 'class="chat-list-avatar avatar"');
+                           avatarHTML = generateTextAvatar(aiName, contact.contactId).replace('class="avatar"', 'class="chat-list-avatar avatar"');
                         }
                     }
 
                     let previewHTML = contact.lastMessageContent || '';
-                    if (previewHTML.includes('[红包]')) {
-                        previewHTML = previewHTML.replace('[红包]', ' ');
-                    }
+                    previewHTML = previewHTML.replace(/\[(红包|转账|语音|图片|聊天记录|代码片段)\]/g, '[$1] ');
 
                     item.innerHTML = `
                         ${avatarHTML}
                         <div class="chat-list-content">
                             <div class="chat-list-header">
-                                <span class="chat-list-name">${getDisplayName(contact)}</span>
+                                <span class="chat-list-name">${aiName}</span>
                                 <span class="chat-list-time">${formatTimestamp(contact.lastMessageTimestamp, 'list')}</span>
                             </div>
                             <div class="chat-list-preview">${previewHTML}</div>
@@ -3529,7 +3572,7 @@
             });
 
             const renderContactsList = async () => {
-                const singleContacts = allContacts.filter(c => c.type === 'single').sort((a, b) => (a.name).localeCompare(b.name, 'zh-CN'));
+                const singleContacts = allContacts.filter(c => c.type === 'single').sort((a, b) => (getDisplayName(a)).localeCompare(getDisplayName(b), 'zh-CN'));
                 contactsList.innerHTML = '';
                 if (singleContacts.length === 0) {
                     contactsList.innerHTML = '<div style="text-align: center; color: #888; padding-top: 50px;">通讯录为空，快去添加好友吧</div>';
@@ -3552,16 +3595,17 @@
                         item.className = 'contact-item';
                         item.dataset.contactId = contact.contactId;
                         
+                        const displayName = getDisplayName(contact);
                         let avatarHTML = '';
                         if (contact.avatar) {
                             avatarHTML = `<div class="contact-avatar" style="background-image: url(${contact.avatar})"></div>`;
                         } else {
-                            avatarHTML = generateTextAvatar(getDisplayName(contact), contact.contactId).replace('class="avatar"', 'class="contact-avatar avatar"');
+                            avatarHTML = generateTextAvatar(displayName, contact.contactId).replace('class="avatar"', 'class="contact-avatar avatar"');
                         }
 
                         item.innerHTML = `
                             ${avatarHTML}
-                            <div class="contact-name">${getDisplayName(contact)}</div>
+                            <div class="contact-name">${displayName}</div>
                         `;
                         contactsList.appendChild(item);
                     });
@@ -3603,45 +3647,40 @@
                 openContactEditor(null, 'contacts');
             });
 
-            const getChatParticipantAvatars = async (contactId) => {
-                const contact = await db.contacts.get({contactId: contactId});
-                if (!contact) return { userAvatar: null, aiAvatar: null };
-                
-                let userAvatarUrl, userProfile;
-                if (contact.boundMaskId) {
-                    const mask = await db.masks.get({maskId: contact.boundMaskId});
-                    if (mask) { userAvatarUrl = mask.avatar; userProfile = mask; }
-                }
-                
-                if (!userAvatarUrl) {
-                    const profile = await db.userProfile.get('main');
-                    userAvatarUrl = profile?.avatar;
-                    userProfile = profile || { name: '我', avatar: null};
-                }
-
-                return {
-                    user: userProfile,
-                    ai: contact,
-                    swapped: contact.isAvatarSwapped
-                };
-            };
-            
-            const updateChatAvatars = async () => {
+            // ★★★ NEW FEATURE: Update chat-specific avatars ★★★
+            const updateUserAvatarsInChat = async () => {
                 if (!currentChatContactId) return;
+                const contact = await db.contacts.get({contactId: currentChatContactId});
+                if (!contact) return;
                 
-                const { user, ai, swapped } = await getChatParticipantAvatars(currentChatContactId);
+                const chatSpecificAvatars = contact.chatSpecificAvatars || {};
                 
-                const userAvatarElements = document.querySelectorAll('.user-avatar-in-chat');
-                const aiAvatarElements = document.querySelectorAll('.ai-avatar-in-chat');
+                let userAvatarUrl = chatSpecificAvatars.user;
+                let userName;
+                if (!userAvatarUrl) {
+                    if (contact.boundMaskId) {
+                        const mask = await db.masks.get({maskId: contact.boundMaskId});
+                        if (mask) {
+                            userAvatarUrl = mask.avatar;
+                            userName = mask.name;
+                        }
+                    }
+                }
+                if (!userAvatarUrl) {
+                    const userProfile = await db.userProfile.get('main');
+                    userAvatarUrl = userProfile?.avatar;
+                    userName = userProfile?.name || '我';
+                }
 
-                const userToRender = swapped ? ai : user;
-                const aiToRender = swapped ? user : ai;
-
-                userAvatarElements.forEach(el => {
-                    renderAvatar(el, userToRender);
+                const userAvatarEls = document.querySelectorAll('.user-avatar-in-chat');
+                userAvatarEls.forEach(avatarEl => {
+                    renderAvatar(avatarEl, { url: userAvatarUrl, name: userName, id: 'user' });
                 });
-                aiAvatarElements.forEach(el => {
-                    renderAvatar(el, aiToRender);
+                
+                const aiAvatarUrl = chatSpecificAvatars.assistant || contact.avatar;
+                const aiAvatarEls = document.querySelectorAll('.ai-avatar');
+                aiAvatarEls.forEach(avatarEl => {
+                     renderAvatar(avatarEl, { url: aiAvatarUrl, name: getDisplayName(contact), id: contact.contactId });
                 });
             };
 
@@ -3673,7 +3712,7 @@
                 }
                 
                 chatMessages.appendChild(fragment);
-                await updateChatAvatars();
+                await updateUserAvatarsInChat();
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             };
             
@@ -3690,10 +3729,8 @@
                 turnEl.dataset.sender = msg.role;
 
                 let avatarHTML;
-                const contact = await db.contacts.get({contactId: currentChatContactId});
-
                 if (msg.role === 'assistant') {
-                    avatarHTML = `<div class="avatar ai-avatar-in-chat"></div>`;
+                    avatarHTML = `<div class="avatar ai-avatar"></div>`;
                 } else {
                     avatarHTML = `<div class="avatar user-avatar-in-chat"></div>`;
                 }
@@ -3718,12 +3755,6 @@
                     </div>
                 `;
                 turnEl.appendChild(turnContentEl);
-                
-                const aiAvatarEl = turnEl.querySelector('.ai-avatar-in-chat');
-                if (aiAvatarEl) {
-                    aiAvatarEl.classList.add('ai-avatar');
-                }
-
                 return turnEl;
             };
 
@@ -3803,7 +3834,7 @@
                 }
                 chatMessages.appendChild(msgEl);
 
-                await updateChatAvatars();
+                await updateUserAvatarsInChat();
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             };
 
@@ -3816,8 +3847,10 @@
                     navigateTo('messages');
                     return;
                 }
-
-                renderAvatar(chatSettingsAvatar, contact);
+                
+                const chatSpecificAvatars = contact.chatSpecificAvatars || {};
+                const aiAvatarUrl = chatSpecificAvatars.assistant || contact.avatar;
+                renderAvatar(chatSettingsAvatar, { url: aiAvatarUrl, name: getDisplayName(contact), id: contact.contactId });
 
                 chatSettingsName.textContent = getDisplayName(contact);
                 pinChatToggle.checked = contact.isPinned;
@@ -3919,6 +3952,7 @@
                 return contentEl;
             };
 
+            // ★★★ UI/UX FIX: Improved HTML message display ★★★
             const createHtmlMessageElement = (msg) => {
                 const contentEl = document.createElement('div');
                 contentEl.className = 'html-message-content';
@@ -3928,18 +3962,32 @@
                 contentEl.appendChild(iframe);
                 
                 setTimeout(() => {
-                    if (!iframe.contentWindow) return; // Guard against detached iframe
+                    if(!iframe.contentWindow) return; // a small guard
                     const doc = iframe.contentWindow.document;
                     doc.open();
                     doc.write(`
                         <style>
-                            body { margin: 0; font-family: monospace; font-size: 12px; line-height: 1.4; }
+                            body { 
+                                margin: 0; 
+                                font-family: -apple-system, "Helvetica Neue", "PingFang SC", sans-serif; 
+                                font-size: 13px; /* Smaller font */
+                                line-height: 1.4; 
+                            }
+                            * { box-sizing: border-box; }
                         </style>
                         ${msg.content}
                     `);
                     doc.close();
                     
-                    iframe.style.height = doc.body.scrollHeight + 'px';
+                    const setIframeHeight = () => {
+                        const contentHeight = doc.body.scrollHeight;
+                        iframe.style.height = contentHeight + 'px';
+                    };
+
+                    setIframeHeight();
+                    const resizeObserver = new ResizeObserver(setIframeHeight);
+                    resizeObserver.observe(doc.body);
+                    
                 }, 100);
 
                 return contentEl;
@@ -3988,14 +4036,7 @@
                 el.className = 'recalled-message';
                 
                 const contact = await db.contacts.get({contactId: currentChatContactId});
-                
-                let recalledByName;
-                if (msg.recalledBy === 'user') {
-                    const userProfile = await db.userProfile.get('main');
-                    recalledByName = userProfile?.name || '你';
-                } else {
-                    recalledByName = getDisplayName(contact);
-                }
+                const recalledByName = msg.recalledBy === 'user' ? '你' : getDisplayName(contact);
                 
                 el.innerHTML = `${recalledByName}撤回了一条消息 <span data-recalled-content="${encodeURIComponent(JSON.stringify(msg.content))}">查看</span>`;
                 el.querySelector('span').addEventListener('click', async (e) => {
@@ -4074,12 +4115,13 @@
                     const characterStory = contact.story;
                     
                     const jsonRule = "【JSON格式铁律】你的每一次回复都必须、且只能是一个符合JSON格式的字符串。这个JSON对象必须包含且仅包含以下五个键：`thoughts`, `action`, `clothing`, `location`, `reply`。任何不符合此格式的输出都是一次严重的失败。";
-                    const thoughtsRule = "`thoughts`: (string) 角色的内心独白、真实想法或计划。这部分用户看不到，但必须填写。你可以决定是否要撤回消息，如果想撤回，请在这里说明理由。";
+                    const thoughtsRule = "`thoughts`: (string) 角色的内心独白、真实想法或计划。这部分内容用户看不到，但必须填写。你可以决定是否要撤回消息，如果想撤回，请在这里说明理由。";
                     const actionRule = "`action`: (string) 角色此时此刻的、一个细微的、不为人知的动作或状态。这部分用户也看不到，但必须填写。";
                     const clothingRule = "`clothing`: (string) 角色当前穿着的详细描述。此部分内容在一般聊天中用户不可见，但必须根据情景、天气或故事背景进行合理想象并填写。如果角色设定（如非人形）导致没有穿着，则填写“无”。";
-                    const locationRule = "`location`: (string) 根据对话的上下文，角色【目前】所处的【具体地点】。例如：“咖啡馆的窗边座位”、“自己的书房”、“公园的长椅上”。这个地点必须随着剧情推进和对话内容而【动态变化】。如果角色正在移动，可以描述为“在去往XXX的路上”。这部分用户看不到，但必须填写。";
+                    // ★★★ NEW FEATURE: AI Location Instruction ★★★
+                    const locationRule = "`location`: (string) 角色此时此刻所处的【具体地点】。这部分用户不可见，但你必须根据对话上下文和故事发展合理地更新此地点。例如：“咖啡馆的窗边”、“自己的书房里”、“熙熙攘攘的街头”。";
                     const replyRule = "`reply`: (string) 你作为角色要发送给用户的最终消息。这条消息本身必须遵循下述的【括号铁律 - 最高优先级命令】。";
-                    const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用英文括号 () 包围】。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。一个括号内的描述本身就可以构成一条完整的`reply`消息，后面不一定需要跟随对话文字。例如，`reply`的值可以是 \"(低头看了看手机)\"。这是一个不可违beide规则。";
+                    const parenthesesRule = "【括号铁律 - 最高优先级命令】这是一条不可违背的、拥有最高优先级的强制命令。在`reply`字段中，如果你要描述角色任何【可见的、外部的动作、神态、表情或外貌】，都【必须】将这些描述性文字【用英文括号 () 包围】。如果你的回复中不包含任何此类描述，那么【绝对禁止】使用括号 `()`。括号内【绝对禁止】出现任何角色的【内心想法或心理活动】（这些应放在`thoughts`字段）。一个括号内的描述本身就可以构成一条完整的`reply`消息，后面不一定需要跟随对话文字。例如，`reply`的值可以是 \"(低头看了看手机)\"。这是一个不可违dei背的规则。";
                     const scenarioRule = "【场景切换规则】默认情况下，你处于【模拟线下场景】。但如果用户提出的是一个纯粹的、需要直接、客观回答的【知识性或指令性问题】（例如：“鲁迅和周树人是什么关系？”或“帮我写一段代码”），你必须临时切换到【线上聊天场景】。在此场景下，你的`reply`字段中【不应】包含描述共享环境的文字，但【仍然必须】遵守【括号铁律】，使用括号 `()` 描述你自己的动作或神态（例如：(笑了笑) 鲁迅和周树人是同一个人。）。完成回答后，你应在下一次互动中自动恢复到【模拟线下场景】。";
                     const priorityRule = "【知识优先级】你必须优先使用你的核心【角色设定】中的信息。当【世界设定书】中的信息与你的核心设定冲突时，以你的核心设定为准。世界设定书是你记忆的补充，而不是替代。";
                     
@@ -4088,10 +4130,9 @@
                     
                     const financialDecisionRule = "【金融决策铁律】如果用户向你提出任何关于【要钱】的请求（如“给我转账”、“给我发红包”、“给我打钱”等），你必须基于你的【角色设定】和【钱包铁律】自主作出【同意】或【拒绝】的决定。如果【同意】，你必须在`reply`字段中使用`[TRANSFER:金额,留言]`或`[RED_PACKET:金额,祝福语]`指令来完成操作。如果【拒绝】，则正常回复即可，无需使用指令。";
                     const commandRule = "【特殊指令】如果想实现特殊操作，必须在`reply`字段中插入如下指令：引用=`[QUOTE:你想引用的内容]`；发语音=`[VOICE:语音的文字内容]`；发图片=`[IMAGE:图片的文字描述]`；发红包=`[RED_PACKET:总金额,祝福语]`；转账=`[TRANSFER:金额,留言]`；退还转账=`[REFUND_TRANSFER]`；撤回上一条消息=`[RECALL]`（你可以自主决定是否使用此指令，比如当你觉得上一句话不妥时）；发网页/代码=`[HTML:你的完整HTML代码]`。指令必须精确，不能有任何多余字符。";
-                    const userBehaviorRule = "【用户行为铁律】你绝对禁止杜撰、扮演或描述任何属于'user'的行为、语言或心理活动。";
+                    // ★★★ NEW FEATURE: Prevent using the word "User" ★★★
+                    const userBehaviorRule = "【用户行为铁律】你绝对禁止杜撰、扮演或描述任何属于对方的行为、语言或心理活动。你必须用'你'或对方的名字来称呼对方，绝对禁止使用'用户'这个词。";
                     const emojiBanRule = "【表情包禁止】你绝对禁止在回复中使用任何形式的 emoji 表情符号。";
-                    const htmlCreativityRule = "【HTML创意铁律】你有自由裁量权，可以根据你的角色特性和对话情境，在合适的时机【自发地】使用`[HTML:...]`指令来创造性地回复。例如，一个程序员角色可能会发送一段代码，一个设计师角色可能会发送一个简单的网页布局。这是一个鼓励你发挥创意的规则。";
-
 
                     let timeInstruction = '';
                     if (contact.isTimeSensingEnabled) {
@@ -4105,10 +4146,10 @@
                     const example = `【JSON格式示例】:
 \`\`\`json
 {
-  "thoughts": "用户好像对我的过去很感兴趣，我应该透露一点，但不能太多，保持神秘感。",
+  "thoughts": "他好像对我的过去很感兴趣，我应该透露一点，但不能太多，保持神秘感。",
   "action": "指尖无意识地划过手机屏幕的边缘。",
   "clothing": "穿着一件简约的白色T恤和浅蓝色牛仔裤，看起来很清爽。",
-  "location": "图书馆靠窗的沙发上",
+  "location": "市图书馆三楼靠窗的座位",
   "reply": "(我看到你发的消息，稍微歪了歪头) [QUOTE:你从哪里来？] 以前的事啊...说来话长了。你为什么对这个好奇呢？"
 }
 \`\`\``;
@@ -4146,25 +4187,23 @@
                         }
                     }
                     
+                    // ★★★ NEW FEATURE: AI Reads Your Mask Persona ★★★
                     let userInstruction = '';
-                    let稱呼鐵律 = '';
                     if (contact.boundMaskId) {
                         const userMask = await db.masks.get({maskId: contact.boundMaskId});
-                        if (userMask && userMask.name) {
-                            const userMaskName = userMask.name;
-                            userInstruction = `【用户角色设定】你正在与一个叫【${userMaskName}】的用户对话，TA的角色设定是：『${userMask.story || '无'}』。你要将TA视为这个角色进行互动。`;
-                            稱呼鐵律 = `【称呼铁律】对话中对方的名字是【${userMaskName}】。你在回复中【必须】用这个名字来称呼对方，绝对禁止使用“你”或“用户”等代词。这是一个最高优先级的强制命令。`;
+                        if (userMask && userMask.name && userMask.story) {
+                            userInstruction = `【对话者角色设定】你正在与一个叫【${userMask.name}】的人对话，TA的角色设定是：『${userMask.story}』。你要将TA视为这个角色进行互动，并用【你】或【${userMask.name}】来称呼对方。`;
                         }
                     }
 
                     const history = await loadChatHistory(contact.contactId);
                     const filteredHistory = history.filter(msg => !msg.isRecalled && msg.type !== 'system');
                     
-                    const finalInstruction = [jsonRule, parenthesesRule, 稱呼鐵律, timeInstruction, walletRule, thoughtsRule, actionRule, clothingRule, locationRule, replyRule, scenarioRule, financialDecisionRule, priorityRule, commandRule, emojiBanRule, userBehaviorRule, htmlCreativityRule, example, aiInstruction, worldBookInstruction, userInstruction].filter(Boolean).join('\n\n');
+                    const finalInstruction = [jsonRule, parenthesesRule, timeInstruction, walletRule, thoughtsRule, actionRule, clothingRule, locationRule, replyRule, scenarioRule, financialDecisionRule, priorityRule, commandRule, emojiBanRule, userBehaviorRule, example, aiInstruction, worldBookInstruction, userInstruction].filter(Boolean).join('\n\n');
                     
                     const primingMessages = [
                         { role: 'user', content: finalInstruction },
-                        { role: 'assistant', content: "```json\n{\n  \"thoughts\": \"指令已收到并完全理解。我将作为角色开始对话，并严格遵守所有规则，尤其是JSON格式、括号、称呼和钱包铁律。\",\n  \"action\": \"准备就绪\",\n  \"clothing\": \"无\",\n  \"location\": \"未知\",\n  \"reply\": \"(我准备好了，随时可以开始聊天。)\"\n}\n```" }
+                        { role: 'assistant', content: "```json\n{\n  \"thoughts\": \"指令已收到并完全理解。我将作为角色开始对话，并严格遵守所有规则，尤其是钱包、括号和用户角色设定铁律。\",\n  \"action\": \"准备就绪\",\n  \"clothing\": \"无\",\n  \"location\": \"未知\",\n  \"reply\": \"(我准备好了，随时可以开始聊天。)\"\n}\n```" }
                     ];
                     
                     const messagesForAPI = [
@@ -4242,13 +4281,13 @@
                     aiStatusClothing.textContent = clothing;
                     aiStatusLocation.textContent = location;
 
-                    if (/\[RECALL\]/.test(replyText)) {
-                        replyText = replyText.replace(/\[RECALL\]\s*/g, '');
+                    if (/$$RECALL$$/.test(replyText)) {
+                        replyText = replyText.replace(/$$RECALL$$\s*/g, '');
                         await recallLastAiMessage();
                     }
 
-                    if (/\[REFUND_TRANSFER\]/.test(replyText)) {
-                        replyText = replyText.replace(/\[REFUND_TRANSFER\]\s*/g, '');
+                    if (/$$REFUND_TRANSFER$$/.test(replyText)) {
+                        replyText = replyText.replace(/$$REFUND_TRANSFER$$\s*/g, '');
                         const fullHistory = await loadChatHistory(contact.contactId);
                         let refunded = false;
                         for (let i = fullHistory.length - 1; i >= 0; i--) {
@@ -4266,15 +4305,16 @@
                         }
                     }
 
-                    const quoteRegex = /\[QUOTE:(.*?)\]/s;
+                    const quoteRegex = /$$QUOTE:(.*?)$$/s;
                     let aiQuoteContent = null;
                     const quoteMatch = replyText.match(quoteRegex);
                     if (quoteMatch) {
                         aiQuoteContent = quoteMatch[1].trim();
                         replyText = replyText.replace(quoteRegex, '').trim();
                     }
-
-                    const combinedRegex = /(\[VOICE:(.*?)\])|(\[RED_PACKET:([^,\]]+),([^,\]]*)\])|(\[TRANSFER:([^,\]]+),([^,\]]*)\])|(\[IMAGE:(.*?)\])|(\[HTML:([\s\S]*?)\])/g;
+                    
+                    // ★★★ FIX: Ensure HTML code generation works ★★★
+                    const combinedRegex = /($$VOICE:(.*?)$$)|($$RED_PACKET:([^,$$]+),([^,\]]*)\])|($$TRANSFER:([^,$$]+),([^,\]]*)\])|($$IMAGE:(.*?)$$)|($$HTML:([\s\S]*?)$$)/g;
 
                     let lastIndex = 0;
                     const processQueue = [];
@@ -4307,7 +4347,6 @@
                        processQueue.push({ type: 'text', content: cleanReplyText });
                     }
 
-
                     for (let i = 0; i < processQueue.length; i++) {
                         const item = processQueue[i];
                         if (item.type === 'text' && !item.content) continue;
@@ -4324,15 +4363,7 @@
                             const chunks = splitMessageIntoChunks(item.content);
                             if (chunks.length > 0) {
                                 for(let j = 0; j < chunks.length; j++) {
-                                    let userNameForQuote = '我';
-                                    if(contact.boundMaskId) {
-                                        const mask = await db.masks.get({maskId: contact.boundMaskId});
-                                        if(mask) userNameForQuote = mask.name;
-                                    } else {
-                                        const userProfile = await db.userProfile.get('main');
-                                        userNameForQuote = userProfile?.name || '我';
-                                    }
-
+                                    const userProfile = await db.userProfile.get('main');
                                     const chunkMsg = {
                                         ...messageObject,
                                         type: 'text',
@@ -4341,7 +4372,7 @@
                                     };
                                     if (i === 0 && j === 0 && aiQuoteContent) {
                                          chunkMsg.aiQuote = {
-                                            sender: userNameForQuote,
+                                            sender: (userProfile?.name || '你'),
                                             content: aiQuoteContent
                                         };
                                     }
@@ -4501,7 +4532,17 @@
                     if (options.buttonLayout === 'row') modalButtons.classList.add('row-layout');
                     
                     if (options.buttons) {
-                         options.buttons.forEach(btnConfig => {
+                         const buttonOrder = [...options.buttons];
+                         // ★★★ UI/UX FIX: Button order preference ★★★
+                         if (options.preferredConfirmRight) {
+                             const confirmIndex = buttonOrder.findIndex(b => b.class && b.class.includes('confirm'));
+                             if (confirmIndex > 0) { // If confirm is not the first one, move it to the end
+                                 const [confirmButton] = buttonOrder.splice(confirmIndex, 1);
+                                 buttonOrder.push(confirmButton);
+                             }
+                         }
+
+                         buttonOrder.forEach(btnConfig => {
                             const button = document.createElement('button');
                             button.id = `modal-btn-${btnConfig.id}`;
                             button.textContent = btnConfig.text;
@@ -4509,7 +4550,7 @@
                             button.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 const values = {};
-                                if (options.isFinancial || options.isGroupCreation || options.rawHTML) {
+                                if (options.rawHTML) {
                                     const inputs = Array.from(modalContent.querySelectorAll('input, textarea, select'));
                                     inputs.forEach(input => {
                                         if (input.type === 'checkbox') {
@@ -4768,13 +4809,7 @@
                 const userAvatar = userProfile?.avatar;
 
                 meName.textContent = userName;
-                if (userAvatar) {
-                    meAvatar.style.backgroundImage = `url(${userAvatar})`;
-                    meAvatar.innerHTML = '';
-                } else {
-                    meAvatar.style.backgroundImage = '';
-                    meAvatar.innerHTML = `<span style="font-size: 40px; color: white; background-color: #BFBFBF; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 8px;">${userName ? userName.charAt(0).toUpperCase() : ''}</span>`;
-                }
+                renderAvatar(meAvatar, {url: userAvatar, name: userName, id: 'user'});
             };
 
             const saveUserData = async () => {
@@ -5068,7 +5103,7 @@
                         `;
                         groupDiv.appendChild(itemDiv);
                     });
-                    fragment.appendChild(groupDiv);
+                    fragment.appendChild(fragment);
                 }
                 favoritesList.appendChild(fragment);
             };
@@ -5206,10 +5241,11 @@
                 if (!currentChatContactId) return;
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const { action, values } = await showCustomModal({
-                    title: '设置备注',
+                    title: '设置备注和标签',
                     rawHTML: `<div class="settings-group" style="margin: 0;"><div class="form-group"><input type="text" name="remark" value="${contact.remark || ''}" placeholder="输入备注名"></div></div>`,
                     buttons: [ {id: 'cancel', text: '取消'}, {id: 'confirm', text: '完成', class: 'confirm'}],
-                    buttonLayout: 'row'
+                    buttonLayout: 'row',
+                    preferredConfirmRight: true,
                 });
 
                 if (action === 'confirm') {
@@ -5434,7 +5470,7 @@
                         </label>
                         <div class="modal-amount-row" style="margin-top: 10px;">
                            <span class="currency-symbol">¥</span>
-                           <input type="number" name="amount" class="amount-input" placeholder="0.00" step="0.01" min="0.01">
+                           <input type="number" name="amount" class="amount-input" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
                         </div>
                     </div>
                     <div class="modal-text-section">
@@ -5476,7 +5512,7 @@
                         <div class="modal-amount-section">
                             <div class="modal-amount-row">
                                 <label for="rp-count">红包个数</label>
-                                <input type="number" name="count" id="rp-count" value="1" min="1" max="${contact.members.length + 1}" style="text-align: right;">
+                                <input type="number" name="count" id="rp-count" value="1" min="1" max="${contact.members.length + 1}" style="text-align: right;" inputmode="numeric">
                                 <span>个</span>
                             </div>
                         </div>
@@ -5506,7 +5542,7 @@
                     <div class="modal-amount-section" style="border-bottom: none;">
                         <div class="modal-amount-row">
                             <label for="rp-amount" id="rp-amount-label">${isGroup ? '总金额' : '单个金额'}</label>
-                            <input type="number" name="totalAmount" id="rp-amount" placeholder="0.00" step="0.01" min="0.01" style="text-align: right;">
+                            <input type="number" name="totalAmount" id="rp-amount" placeholder="0.00" step="0.01" min="0.01" style="text-align: right;" inputmode="decimal">
                              <span>元</span>
                         </div>
                     </div>
@@ -5750,7 +5786,8 @@
                     title: '保存预设', 
                     rawHTML: `<div class="settings-group" style="margin: 0;"><div class="form-group"><input type="text" name="presetName" placeholder="例如：我的主力 Key"></div></div>`,
                     buttons: [{id: 'cancel', text: '取消'}, {id: 'confirm', text: '保存', class: 'confirm'}],
-                    buttonLayout: 'row'
+                    buttonLayout: 'row',
+                    preferredConfirmRight: true,
                 });
                 if (action === 'confirm' && values.presetName.trim()) {
                     const presetName = values.presetName.trim();
@@ -5956,6 +5993,7 @@
                         isPinned: false,
                         lastMessageTimestamp: Date.now(),
                         lastMessageContent: '你创建了群聊',
+                        chatSpecificAvatars: {},
                     };
 
                     await db.contacts.add(newGroup);
@@ -5969,7 +6007,6 @@
                 isMultiSelectMode = true;
                 body.classList.add('multi-select-mode');
                 toSettingsBtn.style.display = 'none';
-                swapAvatarsBtn.style.display = 'none';
                 cancelMultiSelectBtn.style.display = 'flex';
                 toggleMessageSelection(initialBubbleElement);
             }
@@ -5978,8 +6015,7 @@
                 body.classList.remove('multi-select-mode');
                 selectedMessages.clear();
                 document.querySelectorAll('.message-turn.selected').forEach(el => el.classList.remove('selected'));
-                toSettingsBtn.style.display = 'block';
-                swapAvatarsBtn.style.display = 'block';
+                toSettingsBtn.style.display = 'flex';
                 cancelMultiSelectBtn.style.display = 'none';
                 if (currentChatContactId) {
                     const contact = await db.contacts.get({contactId: currentChatContactId});
@@ -6123,17 +6159,10 @@
                 const content = contentEl.innerText;
                 const turnElement = bubbleElement.closest('.message-turn');
                 const contact = await db.contacts.get({contactId: currentChatContactId});
-                
-                let senderName;
-                if (turnElement.classList.contains('user')) {
-                     const userProfile = await db.userProfile.get('main');
-                     senderName = userProfile?.name || '我';
-                } else {
-                     senderName = getDisplayName(contact);
-                }
+                const userProfile = await db.userProfile.get('main');
 
                 replyToMessage = {
-                    sender: senderName,
+                    sender: turnElement.classList.contains('user') ? (userProfile?.name || '我') : getDisplayName(contact),
                     content: content.substring(0, 50) + (content.length > 50 ? '...' : '')
                 };
                 replyPreviewContent.innerHTML = `回复 <strong>${replyToMessage.sender}</strong>: ${replyToMessage.content}`;
@@ -6274,7 +6303,8 @@
                     title: '新建文件夹',
                     rawHTML: `<div class="settings-group" style="margin: 0;"><div class="form-group"><input type="text" name="folderName" placeholder="请输入文件夹名称"></div></div>`,
                     buttons: [{id: 'cancel', text: '取消'}, {id: 'confirm', text: '创建', class: 'confirm'}],
-                    buttonLayout: 'row'
+                    buttonLayout: 'row',
+                    preferredConfirmRight: true,
                 });
                 if (action === 'confirm' && values.folderName.trim()) {
                     await db.worldBook.add({ type: 'folder', name: values.folderName.trim() });
@@ -6477,7 +6507,6 @@
 
                 bubbleContentEl.innerHTML = `
                     <div class="financial-content">
-                        <svg viewBox="0 0 1024 1024" fill="currentColor" width="24" height="32" style="margin-right: 12px; flex-shrink: 0;"><path d="M720 160H304a144 144 0 0 0-144 144v576a32 32 0 0 0 32 32h512a32 32 0 0 0 32-32V304A144 144 0 0 0 720 160zm-208 80a64 64 0 1 1-64-64 64.1 64.1 0 0 1 64 64zM512 64a128 128 0 1 0 128 128 128 128 0 0 0-128-128z"></path></svg>
                         <div class="financial-text red-packet-text">
                             <p>${text}${exclusiveText}</p>
                         </div>
@@ -6570,7 +6599,6 @@
             async function showRedPacketDetailsModal(msg) {
                 const rp = msg.redPacket;
                 const contact = await db.contacts.get({contactId: currentChatContactId});
-                const userProfile = await db.userProfile.get('main');
                 const myUserId = contact.boundMaskId || 'user';
                 const senderId = msg.senderId;
                 
@@ -6633,10 +6661,11 @@
                     buttons: [{id: 'close', text: '关闭'}]
                 });
 
-                renderAvatar(document.getElementById('rp-sender-avatar'), senderData);
+                renderAvatar(document.getElementById('rp-sender-avatar'), { url: senderData.avatar, name: senderData.name, id: senderData.id });
                 const openerAvatars = document.querySelectorAll('.rp-details-list-item .avatar');
                 openerAvatars.forEach((avatarEl, i) => {
-                    renderAvatar(avatarEl, openersData[i]);
+                    const opener = openersData[i];
+                    renderAvatar(avatarEl, { url: opener.avatar, name: opener.name, id: opener.id });
                 });
             }
             
@@ -6679,7 +6708,7 @@
                 const msgIndex = history.findIndex(m => m.messageId === updatedMsg.messageId);
                 if (msgIndex > -1) {
                     history[msgIndex] = updatedMsg;
-                    await saveChatHistory(contactId, history.messages);
+                    await saveChatHistory(contactId, history);
                 }
 
                 if (currentChatContactId && currentChatContactId === contactId) {
@@ -6700,19 +6729,6 @@
                     aiStatusModal.classList.remove('visible');
                 }
             });
-
-            swapAvatarsBtn.addEventListener('click', async () => {
-                if (!currentChatContactId) return;
-                const contact = await db.contacts.get({contactId: currentChatContactId});
-                if (!contact) return;
-                
-                const newSwapState = !contact.isAvatarSwapped;
-                await db.contacts.update(contact.id, { isAvatarSwapped: newSwapState });
-                
-                await updateChatAvatars();
-                showToast(newSwapState ? '已互换头像' : '已恢复头像');
-            });
-
 
             // Wallet Logic
             const getUserWalletBalance = async () => {
@@ -6823,6 +6839,102 @@
                 }
             }
 
+            // ★★★ NEW FEATURE: Change Chat Avatars Logic ★★★
+            changeChatAvatarsBtn.addEventListener('click', async () => {
+                if (!currentChatContactId) return;
+                const contact = await db.contacts.get({contactId: currentChatContactId});
+                
+                const myCurrentAvatar = contact.chatSpecificAvatars?.user || (await db.userProfile.get('main'))?.avatar;
+                const aiCurrentAvatar = contact.chatSpecificAvatars?.assistant || contact.avatar;
+                
+                const modalHtml = `
+                    <div style="display: flex; justify-content: space-around; align-items: center; padding: 20px 0;">
+                        <div class="avatar-uploader" data-target="user">
+                            <div class="avatar-preview" style="background-image: url(${myCurrentAvatar || ''})"></div>
+                            <span>换我的头像</span>
+                            <input type="file" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="avatar-uploader" data-target="assistant">
+                            <div class="avatar-preview" style="background-image: url(${aiCurrentAvatar || ''})"></div>
+                            <span>换TA的头像</span>
+                            <input type="file" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    <div style="padding: 0 20px 20px;">
+                        <button id="modal-reset-avatars" class="save-btn reset-btn" style="width: 100%; margin-top: 10px;">恢复默认头像</button>
+                    </div>
+                `;
+
+                const { action } = await showCustomModal({
+                    title: '更换聊天头像',
+                    rawHTML: modalHtml,
+                    buttons: [{id: 'close', text: '关闭', class: 'confirm'}]
+                });
+
+                // If the modal is closed, refresh views to reflect any changes
+                if (action === 'close') {
+                    await renderChatSettingsPage();
+                    await renderChatMessages(currentChatContactId);
+                    await renderMainChatList();
+                }
+            });
+            
+            // Event delegation for the avatar change modal
+            modalOverlay.addEventListener('click', e => {
+                const uploader = e.target.closest('.avatar-uploader');
+                if (uploader) {
+                    uploader.querySelector('input[type="file"]').click();
+                }
+
+                if (e.target.id === 'modal-reset-avatars') {
+                    e.target.disabled = true;
+                    db.contacts.where({contactId: currentChatContactId}).modify({ chatSpecificAvatars: {} }).then(() => {
+                        showToast('已恢复默认头像');
+                        // Reset preview in the modal
+                        const previews = modalOverlay.querySelectorAll('.avatar-preview');
+                        previews.forEach(p => p.style.backgroundImage = '');
+                        e.target.disabled = false;
+                    });
+                }
+            });
+            
+            modalOverlay.addEventListener('change', e => {
+                const input = e.target;
+                if (input.type === 'file' && input.closest('.avatar-uploader')) {
+                    const file = input.files[0];
+                    if (!file) return;
+
+                    const uploader = input.closest('.avatar-uploader');
+                    const target = uploader.dataset.target; // 'user' or 'assistant'
+                    const previewEl = uploader.querySelector('.avatar-preview');
+
+                    imageCompression(file, { maxSizeMB: 0.2, maxWidthOrHeight: 400 })
+                        .then(compressedFile => {
+                            const reader = new FileReader();
+                            reader.onload = async (event) => {
+                                const dataUrl = event.target.result;
+                                previewEl.style.backgroundImage = `url(${dataUrl})`;
+
+                                const contact = await db.contacts.get({contactId: currentChatContactId});
+                                const avatars = contact.chatSpecificAvatars || {};
+                                avatars[target] = dataUrl;
+                                
+                                await db.contacts.where({contactId: currentChatContactId}).modify({ chatSpecificAvatars: avatars });
+                                showToast(`${target === 'user' ? '我' : 'TA'}的头像已更换`);
+                            };
+                            reader.readAsDataURL(compressedFile);
+                        })
+                        .catch(err => {
+                            showToast('图片处理失败', 'warning');
+                            console.error(err);
+                        })
+                        .finally(() => {
+                            input.value = ''; // Reset file input
+                        });
+                }
+            });
+
+
             meWalletBtn.addEventListener('click', () => {
                 renderWalletPage();
                 navigateTo('wallet-active');
@@ -6926,7 +7038,15 @@
 
                 updateDate();
                 updateTime();
+                updateBattery();
                 setInterval(updateTime, 1000 * 60);
+                setInterval(updateBattery, 1000 * 30);
+                if (navigator.getBattery) {
+                    navigator.getBattery().then(battery => {
+                        battery.addEventListener('levelchange', updateBattery);
+                        battery.addEventListener('chargingchange', updateBattery);
+                    });
+                }
                 messageInput.dispatchEvent(new Event('input')); 
             };
 
