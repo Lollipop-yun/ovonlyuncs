@@ -32,6 +32,7 @@
             --tab-bar-height: 50px;
             --pinned-bg-color: #F3F3F3;
             --actions-panel-height: 220px;
+            --sticker-panel-height: 250px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -728,6 +729,9 @@
         body.more-actions-visible #chat-messages {
             padding-bottom: calc(15px + var(--actions-panel-height));
         }
+        body.sticker-panel-visible #chat-messages {
+            padding-bottom: calc(15px + var(--sticker-panel-height));
+        }
         .chat-messages .loading-spinner-container {
             display: flex;
             justify-content: center;
@@ -898,6 +902,11 @@
             cursor: pointer; 
             flex-shrink: 0; 
             transition: opacity 0.2s;
+            background: transparent;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .send-btn { 
             display: none;
@@ -918,24 +927,17 @@
             background-size: 60%;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 0;
         }
 
-        #more-actions-btn, #emoji-btn {
+        #more-actions-btn, #sticker-btn {
             width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            background: transparent;
         }
-        #more-actions-btn svg, #emoji-btn svg {
+        #more-actions-btn svg, #sticker-btn svg {
             width: 28px;
             height: 28px;
             color: #333;
         }
+        
 
         .action-btn:disabled { 
             opacity: 0.5; 
@@ -946,23 +948,33 @@
         }
 
 
-        #more-actions-panel {
+        #more-actions-panel, #sticker-panel {
             position: absolute;
             bottom: 100%;
             left: 0;
             width: 100%;
             background-color: var(--ios-system-gray);
             border-top: 1px solid var(--ios-border-color);
-            padding: 20px 15px;
             transform: translateY(100%);
             transition: transform 0.3s ease-in-out, visibility 0.3s;
             z-index: 10;
             visibility: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        body.more-actions-visible #more-actions-panel {
+        #more-actions-panel {
+            padding: 20px 15px;
+        }
+        #sticker-panel {
+            height: var(--sticker-panel-height);
+        }
+
+        body.more-actions-visible #more-actions-panel,
+        body.sticker-panel-visible #sticker-panel {
             transform: translateY(0);
             visibility: visible;
         }
+
         .action-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -2284,20 +2296,93 @@
             opacity: 1;
         }
         
-        .image-message-content {
-            max-width: 200px;
-            max-height: 200px;
+        .image-message-content, .sticker-message-content {
+            max-width: 150px;
+            max-height: 150px;
             border-radius: 8px;
             overflow: hidden;
+            background-color: transparent;
+        }
+        .image-message-content {
             border: 1px solid var(--ios-border-color);
             background-color: #e0e0e0;
         }
-        .image-message-content img {
+        .image-message-content img, .sticker-message-content img {
             display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
             cursor: pointer;
+        }
+
+        #sticker-panel-header {
+            padding: 0 10px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--ios-border-color);
+        }
+        .sticker-panel-btn {
+            background-color: #fff;
+            border: 1px solid var(--ios-border-color);
+            color: var(--text-dark);
+            padding: 4px 10px;
+            font-size: 13px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .sticker-panel-btn:hover { background-color: #f0f0f0; }
+        .sticker-panel-btn.active { background-color: var(--ios-blue); color: white; border-color: var(--ios-blue); }
+
+        #sticker-grid-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+        }
+        .sticker-item {
+            position: relative;
+            width: 100%;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+        .sticker-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 5px;
+        }
+        body.sticker-delete-mode .sticker-item::after {
+            content: '×';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            background-color: var(--ios-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
     </style>
@@ -2863,6 +2948,16 @@
                         <div class="action-grid-item" data-action="voice-call"><div class="action-grid-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg></div><span class="action-grid-label">语音通话</span></div>
                     </div>
                     <input type="file" id="image-upload-input" accept="image/*" style="display: none;">
+                    
+                </div>
+                <div id="sticker-panel">
+                    <div id="sticker-panel-header">
+                        <button id="sticker-add-album" class="sticker-panel-btn">相册添加</button>
+                        <button id="sticker-add-url" class="sticker-panel-btn">URL添加</button>
+                        <button id="sticker-manage" class="sticker-panel-btn">管理</button>
+                    </div>
+                    <div id="sticker-grid-container"></div>
+                    <input type="file" id="sticker-upload-input" accept="image/*" multiple style="display: none;" />
                 </div>
                 <div id="reply-preview-bar">
                     <div class="reply-preview-content"></div>
@@ -2876,12 +2971,12 @@
                             <path d="M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-                    <button id="emoji-btn" class="action-btn">
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14"/>
-                            <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <button id="sticker-btn" class="action-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                            <line x1="15" y1="9" x2="15.01" y2="9"></line>
                         </svg>
                     </button>
                     <textarea id="message-input" rows="1" placeholder="发送消息"></textarea>
@@ -2927,7 +3022,7 @@
 
         <div id="ai-status-modal">
             <div class="ai-status-box">
-                <h3>AI 状态</h3>
+                <h3 id="ai-status-header">AI 状态</h3>
                 <h4>内心想法</h4>
                 <p id="ai-status-thoughts">(暂无)</p>
                 <h4>细微动作</h4>
@@ -2964,7 +3059,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const db = new Dexie("onlyunApp");
-            db.version(24).stores({
+            db.version(25).stores({
                 contacts: '++id, &contactId, type, isPinned, lastMessageTimestamp',
                 masks: '++id, &maskId',
                 chatHistories: '&contactId',
@@ -2973,7 +3068,8 @@
                 favorites: '&favId, contactId, timestamp',
                 worldBook: '++id, type, folderId, name',
                 userProfile: '&key',
-                transactions: '++id, timestamp, owner'
+                transactions: '++id, timestamp, owner',
+                stickers: '++id, &name' // New table for stickers
             });
 
             // DOM Elements
@@ -3020,8 +3116,9 @@
             const sendBtn = document.getElementById('send-btn');
             const generateBtn = document.getElementById('generate-btn');
             const moreActionsBtn = document.getElementById('more-actions-btn');
-            const emojiBtn = document.getElementById('emoji-btn');
+            const stickerBtn = document.getElementById('sticker-btn');
             const moreActionsPanel = document.getElementById('more-actions-panel');
+            const stickerPanel = document.getElementById('sticker-panel');
             
             const toSettingsBtn = document.getElementById('to-settings-btn');
             const backToChatBtn = document.getElementById('back-to-chat-btn');
@@ -3145,6 +3242,7 @@
             const backToChatSettingsFromWBBindingBtn = document.getElementById('back-to-chat-settings-from-wb-binding-btn');
 
             const aiStatusModal = document.getElementById('ai-status-modal');
+            const aiStatusHeader = document.getElementById('ai-status-header');
             const aiStatusThoughts = document.getElementById('ai-status-thoughts');
             const aiStatusAction = document.getElementById('ai-status-action');
             const aiStatusClothing = document.getElementById('ai-status-clothing');
@@ -3161,6 +3259,8 @@
 
             const changeChatAvatarsBtn = document.getElementById('change-chat-avatars-btn');
             const imageUploadInput = document.getElementById('image-upload-input');
+            const stickerUploadInput = document.getElementById('sticker-upload-input');
+            const stickerGridContainer = document.getElementById('sticker-grid-container');
 
             // State variables
             let currentChatContactId = null;
@@ -3554,7 +3654,7 @@
                     }
 
                     let previewHTML = contact.lastMessageContent || '';
-                    previewHTML = previewHTML.replace(/$$(红包|转账|语音|图片|聊天记录|代码片段|相册)$$/g, '[\$1] ');
+                    previewHTML = previewHTML.replace(/\[(红包|转账|语音|图片|表情|聊天记录|代码片段|相册)\]/g, '[$1] ');
 
                     item.innerHTML = `
                         ${avatarHTML}
@@ -3610,7 +3710,7 @@
                             avatarHTML = generateTextAvatar(displayName, contact.contactId).replace('class="avatar"', 'class="contact-avatar avatar"');
                         }
 
-                        item.innerHTML =`
+                        item.innerHTML = `
                             ${avatarHTML}
                             <div class="contact-name">${displayName}</div>
                         `;
@@ -3802,6 +3902,8 @@
                     messageElement = createHtmlMessageElement(msg);
                 } else if (msg.type === 'image') {
                     messageElement = createImageMessageElement(msg);
+                } else if (msg.type === 'sticker') {
+                    messageElement = createStickerMessageElement(msg);
                 } else {
                     messageElement = createTextMessageElement(msg);
                 }
@@ -3892,6 +3994,7 @@
                 else if (msg.type === 'transfer') previewContent = '[转账]';
                 else if (msg.type === 'voice') previewContent = '[语音]';
                 else if (msg.type === 'image') previewContent = '[相册]';
+                else if (msg.type === 'sticker') previewContent = '[表情]';
                 else if (msg.type === 'described-image') previewContent = '[图片]';
                 else if (msg.type === 'merged') previewContent = '[聊天记录]';
                 else if (msg.type === 'html') previewContent = '[代码片段]';
@@ -3920,7 +4023,7 @@
                 aiStatusAction.textContent = contact.lastAiAction || '(暂无)';
                 aiStatusClothing.textContent = contact.lastAiClothing || '(暂无)';
                 aiStatusLocation.textContent = contact.lastAiLocation || '(暂无)';
-                aiStatusModal.querySelector('h3').textContent = `${getDisplayName(contact)}的状态`;
+                aiStatusHeader.textContent = `${getDisplayName(contact)}的状态`;
 
                 chatHeaderTitle.textContent = getDisplayName(contact);
                 
@@ -4025,6 +4128,15 @@
                 contentEl.appendChild(img);
                 return contentEl;
             };
+            
+            const createStickerMessageElement = (msg) => {
+                const contentEl = document.createElement('div');
+                contentEl.className = 'sticker-message-content';
+                const img = document.createElement('img');
+                img.src = msg.imageUrl;
+                contentEl.appendChild(img);
+                return contentEl;
+            };
 
             const createMergedForwardElement = (msg) => {
                 const headerText = `与 ${msg.content.from} 的聊天记录`;
@@ -4070,7 +4182,7 @@
                         if(recalledContent.type === 'red-packet') contentToShow = `[红包] ${recalledContent.redPacket.text}`;
                         else if (recalledContent.type === 'transfer') contentToShow = `[转账] ¥${recalledContent.transfer.amount.toFixed(2)}`;
                         else if (recalledContent.type === 'voice') contentToShow = `[语音] ${recalledContent.content}`;
-                        else if (recalledContent.type === 'image') contentToShow = `[相册] 图片消息无法预览`;
+                        else if (recalledContent.type === 'image' || recalledContent.type === 'sticker') contentToShow = `[图片/表情] 消息无法预览`;
                         else if (recalledContent.type === 'described-image') contentToShow = `[图片] ${recalledContent.content}`;
                         else if (recalledContent.type === 'html') contentToShow = `[代码片段]\n\n(代码内容较长，无法预览)`;
                         else contentToShow = recalledContent.content || recalledContentRaw;
@@ -4150,7 +4262,7 @@
                     const walletRule = `【钱包铁律】你的零钱余额为 ${aiWalletBalance.toFixed(2)} 元。在决定是否同意用户的金融请求（如发红包、转账）时，你必须确保你有足够的余额。如果余额不足，你必须拒绝请求。`;
                     
                     const financialDecisionRule = "【金融决策铁律】如果用户向你提出任何关于【要钱】的请求（如“给我转账”、“给我发红包”），或者在对话中，你根据你的【角色设定】和【钱包铁律】自主判断认为应该给对方【发红包】或【转账】，你都必须自主作出【同意】或【拒绝】的决定。如果【同意】，你必须在`reply`字段中使用`[TRANSFER:金额,留言]`或`[RED_PACKET:金额,祝福语]`指令来完成操作。如果【拒绝】，则正常回复即可。";
-                    const commandRule = "【特殊指令】如果想实现特殊操作，必须在`reply`字段中插入如下指令：引用=`[QUOTE:你想引用的内容]`；发语音=`[VOICE:语音的文字内容]`；发图片=`[IMAGE:图片的文字描述]`；发红包=`[RED_PACKET:总金额,祝福语]`；转账=`[TRANSFER:金额,留言]`；退还转账=`[REFUND_TRANSFER]`；【撤回上一条消息】=`[RECALL]`（你可以自主决定是否使用此指令，比如当你觉得上一句话不妥时）；发网页/代码=`[HTML:你的完整HTML代码]`。指令必须精确，不能有任何多余字符。";
+                    const commandRule = "【特殊指令】如果想实现特殊操作，必须在`reply`字段中插入如下指令：引用=`[QUOTE:你想引用的内容]`；发语音=`[VOICE:语音的文字内容]`；发图片=`[IMAGE:图片的文字描述]`；发表情=`[STICKER:表情的文字描述]`；发红包=`[RED_PACKET:总金额,祝福语]`；转账=`[TRANSFER:金额,留言]`；退还转账=`[REFUND_TRANSFER]`；【撤回上一条消息】=`[RECALL]`（你可以自主决定是否使用此指令，比如当你觉得上一句话不妥时）；发网页/代码=`[HTML:你的完整HTML代码]`。指令必须精确，不能有任何多余字符。";
                     const userBehaviorRule = "【用户行为铁律】你绝对禁止杜撰、扮演或描述任何属于对方的行为、语言或心理活动。你必须用'你'或对方的名字来称呼对方，绝对禁止使用'用户'这个词。";
                     const emojiBanRule = "【表情包禁止】你绝对禁止在回复中使用任何形式的 emoji 表情符号。";
 
@@ -4215,10 +4327,15 @@
                         }
                     }
 
+                    const allStickers = await db.stickers.toArray();
+                    const stickerInstruction = allStickers.length > 0 
+                        ? `【你的表情包列表】你拥有以下表情包，你可以通过它们的【文字描述】来使用它们：[${allStickers.map(s => `"${s.name}"`).join(', ')}]。请根据对话氛围和你的角色性格，适时地使用 [STICKER:表情包文字描述] 指令来发送表情。`
+                        : '';
+                    
                     const history = await loadChatHistory(contact.contactId);
                     const filteredHistory = history.filter(msg => !msg.isRecalled && msg.type !== 'system');
                     
-                    const finalInstruction = [jsonRule, parenthesesRule, timeInstruction, walletRule, thoughtsRule, actionRule, clothingRule, locationRule, replyRule, scenarioRule, financialDecisionRule, priorityRule, commandRule, emojiBanRule, userBehaviorRule, example, aiInstruction, worldBookInstruction, userInstruction].filter(Boolean).join('\n\n');
+                    const finalInstruction = [jsonRule, parenthesesRule, timeInstruction, stickerInstruction, walletRule, thoughtsRule, actionRule, clothingRule, locationRule, replyRule, scenarioRule, financialDecisionRule, priorityRule, commandRule, emojiBanRule, userBehaviorRule, example, aiInstruction, worldBookInstruction, userInstruction].filter(Boolean).join('\n\n');
                     
                     const isVisionModel = modelName.includes('vision') || modelName.includes('v');
                     
@@ -4249,6 +4366,8 @@
                                 }
                             } else if (m.type === 'image') {
                                 apiContent = `[${sender}发送了一张图片，但我无法查看。]`;
+                            } else if (m.type === 'sticker') {
+                                apiContent = `[${sender}发送了一个表情: ${m.stickerName}]`;
                             } else if(m.type === 'red-packet') {
                                 let stateText = '';
                                 const openedCount = (m.redPacket.openers || []).length;
@@ -4318,13 +4437,13 @@
                     aiStatusClothing.textContent = clothing;
                     aiStatusLocation.textContent = location;
 
-                    if (/\[RECALL\]/.test(replyText)) {
-                        replyText = replyText.replace(/\[RECALL\]\s*/g, '');
+                    if (/$$RECALL$$/.test(replyText)) {
+                        replyText = replyText.replace(/$$RECALL$$\s*/g, '');
                         await recallLastAiMessage();
                     }
 
-                    if (/\[REFUND_TRANSFER\]/.test(replyText)) {
-                        replyText = replyText.replace(/\[REFUND_TRANSFER\]\s*/g, '');
+                    if (/$$REFUND_TRANSFER$$/.test(replyText)) {
+                        replyText = replyText.replace(/$$REFUND_TRANSFER$$\s*/g, '');
                         const fullHistory = await loadChatHistory(contact.contactId);
                         let refunded = false;
                         for (let i = fullHistory.length - 1; i >= 0; i--) {
@@ -4342,7 +4461,7 @@
                         }
                     }
 
-                    const quoteRegex = /\[QUOTE:(.*?)\]/s;
+                    const quoteRegex = /$$QUOTE:(.*?)$$/s;
                     let aiQuoteContent = null;
                     const quoteMatch = replyText.match(quoteRegex);
                     if (quoteMatch) {
@@ -4350,13 +4469,13 @@
                         replyText = replyText.replace(quoteRegex, '').trim();
                     }
                     
-                    const combinedRegex = /(\[VOICE:(.*?)\])|(\[RED_PACKET:([^,\]]+),([^,\]]*)\])|(\[TRANSFER:([^,\]]+),([^,\]]*)\])|(\[IMAGE:(.*?)\])|(\[HTML:([\s\S]*?)\])/g;
+                    const combinedRegex = /($$VOICE:(.*?)$$)|($$RED_PACKET:([^,$$]+),([^,\]]*)\])|($$TRANSFER:([^,$$]+),([^,\]]*)\])|($$IMAGE:(.*?)$$)|($$STICKER:(.*?)$$)|($$HTML:([\s\S]*?)$$)/g;
 
                     let lastIndex = 0;
                     const processQueue = [];
                     const cleanReplyText = replyText;
 
-                    cleanReplyText.replace(combinedRegex, (match, voiceFull, voiceContent, rpFull, rpAmount, rpText, trFull, trAmount, trText, imgFull, imgDesc, htmlFull, htmlContent, offset) => {
+                    cleanReplyText.replace(combinedRegex, (match, voiceFull, voiceContent, rpFull, rpAmount, rpText, trFull, trAmount, trText, imgFull, imgDesc, stickerFull, stickerName, htmlFull, htmlContent, offset) => {
                         if (offset > lastIndex) {
                             processQueue.push({ type: 'text', content: cleanReplyText.substring(lastIndex, offset).trim() });
                         }
@@ -4368,6 +4487,8 @@
                              processQueue.push({ type: 'transfer', amount: parseFloat(trAmount) || 0, text: (trText || '').trim() });
                         } else if (imgFull) {
                              processQueue.push({ type: 'described-image', content: (imgDesc || '').trim() });
+                        } else if (stickerFull) {
+                            processQueue.push({ type: 'sticker', name: (stickerName || '').trim() });
                         } else if (htmlFull) {
                             processQueue.push({ type: 'html', content: (htmlContent || '').trim() });
                         }
@@ -4432,6 +4553,15 @@
                             messageObject.content = item.content;
                             await addMessageToUI(messageObject);
                             await sleep(300);
+                        } else if (item.type === 'sticker') {
+                            const sticker = await db.stickers.get({ name: item.name });
+                            if (sticker) {
+                                messageObject.type = 'sticker';
+                                messageObject.imageUrl = sticker.url;
+                                messageObject.stickerName = sticker.name;
+                                await addMessageToUI(messageObject);
+                                await sleep(300);
+                            }
                         } else if (item.type === 'red-packet') {
                              await addAITransaction('red-packet-sent', -item.amount, contact.contactId);
                              messageObject.type = 'red-packet';
@@ -4595,7 +4725,11 @@
                                         values[input.name] = input.type === 'number' ? parseFloat(input.value) || 0 : input.value;
                                     }
                                 });
-                                cleanup();
+                                
+                                if (options.closeOnClick !== false || btnConfig.id === 'cancel' || btnConfig.id === 'close') {
+                                    cleanup();
+                                }
+                                
                                 resolve({ action: btnConfig.id, values });
                             });
                             modalButtons.appendChild(button);
@@ -4747,6 +4881,7 @@
                     else if (msg.type === 'transfer') contentToCopy = `[转账] ¥${msg.transfer.amount.toFixed(2)}`;
                     else if (msg.type === 'voice') contentToCopy = `[语音] ${msg.content}`;
                     else if (msg.type === 'image') contentToCopy = `[相册]`;
+                    else if (msg.type === 'sticker') contentToCopy = `[表情] ${msg.stickerName}`;
                     else if (msg.type === 'described-image') contentToCopy = `[图片] ${msg.content}`;
                     else if (msg.type === 'html') contentToCopy = msg.content;
                     else contentToCopy = msg.content;
@@ -5169,6 +5304,7 @@
             backToMainBtn.addEventListener('click', () => navigateTo('messages'));
             backToListBtn.addEventListener('click', () => {
                 body.classList.remove('more-actions-visible');
+                body.classList.remove('sticker-panel-visible');
                 navigateTo('messages');
             });
             toSettingsBtn.addEventListener('click', () => {
@@ -5422,18 +5558,32 @@
                 await generateResponse();
             });
 
-            moreActionsBtn.addEventListener('click', () => {
-                body.classList.toggle('more-actions-visible');
-                if (body.classList.contains('more-actions-visible')) {
+            const togglePanel = (panelName) => {
+                const isPanelVisible = body.classList.contains(`${panelName}-visible`);
+
+                // Close any other open panels first
+                ['more-actions-visible', 'sticker-panel-visible'].forEach(cls => {
+                    if (cls !== `${panelName}-visible`) {
+                        body.classList.remove(cls);
+                    }
+                });
+                
+                // Then toggle the requested panel
+                body.classList.toggle(`${panelName}-visible`, !isPanelVisible);
+
+                if (!isPanelVisible) {
                     document.activeElement.blur();
+                    // Ensure scroll to bottom after panel animates
                     setTimeout(() => {
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                     }, 300);
                 }
-            });
-            emojiBtn.addEventListener('click', () => {
-                showToast('表情功能开发中...');
-                body.classList.remove('more-actions-visible');
+            };
+            
+            moreActionsBtn.addEventListener('click', () => togglePanel('more-actions'));
+            stickerBtn.addEventListener('click', () => {
+                renderStickerPanel();
+                togglePanel('sticker-panel');
             });
             
             async function showTransferModal() {
@@ -5694,6 +5844,7 @@
 
             messageInput.addEventListener('focus', () => {
                 body.classList.remove('more-actions-visible');
+                body.classList.remove('sticker-panel-visible');
             });
             chatMessages.addEventListener('click', async (e) => {
                 const aiAvatar = e.target.closest('.ai-avatar');
@@ -5702,9 +5853,9 @@
                     confirmAndRegenerate();
                     return;
                 }
-                const img = e.target.closest('.image-message-content img');
+                const img = e.target.closest('.image-message-content img, .sticker-message-content img');
                 if (img) {
-                    const { action } = await showCustomModal({ title: '图片预览', rawHTML: `<img src="${img.src}" style="max-width: 100%; border-radius: 8px;">`, buttons: [{id: 'close', text: '关闭', class: 'confirm'}]});
+                    await showCustomModal({ title: '图片预览', rawHTML: `<img src="${img.src}" style="max-width: 100%; border-radius: 8px;">`, buttons: [{id: 'close', text: '关闭', class: 'confirm'}]});
                     return;
                 }
 
@@ -5718,6 +5869,7 @@
 
                 if (!e.target.closest('.red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble')) {
                     body.classList.remove('more-actions-visible');
+                    body.classList.remove('sticker-panel-visible');
                 }
             });
 
@@ -5865,7 +6017,7 @@
 
             const showDevToast = () => showToast('该功能正在紧张开发中，敬请期待！');
             
-            [document.getElementById('tab-discover'), meMomentsBtn, meStickersBtn, document.getElementById('forum-app-icon'), document.getElementById('icity-app-icon'), document.getElementById('dev2-app-icon')].forEach(btn => btn.addEventListener('click', showDevToast));
+            [document.getElementById('tab-discover'), meMomentsBtn, document.getElementById('forum-app-icon'), document.getElementById('icity-app-icon'), document.getElementById('dev2-app-icon')].forEach(btn => btn.addEventListener('click', showDevToast));
             
             meName.addEventListener('blur', saveUserData);
             meAvatar.addEventListener('click', () => meAvatarInput.click());
@@ -5889,6 +6041,7 @@
                 renderMasksList();
                 navigateTo('my-masks-active');
             });
+            meStickersBtn.addEventListener('click', () => showCustomModal({title: "提示", message: "表情包功能已集成至聊天界面输入框旁，点击笑脸图标即可使用。", buttons: [{id: 'ok', text: '知道了', class: 'confirm'}]}));
             meFavoritesBtn.addEventListener('click', () => {
                 renderFavorites();
                 navigateTo('favorites-active');
@@ -5967,12 +6120,12 @@
                 
                 const messageId = bubbleElement.dataset.messageId;
                 if (isSelected) {
-                    const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .image-message-content');
+                    const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .image-message-content, .sticker-message-content');
                     const userProfile = await db.userProfile.get('main');
                     selectedMessages.set(messageId, {
                         messageId: messageId,
                         sender: turnElement.classList.contains('user') ? (userProfile?.name || '我') : getDisplayName(contact),
-                        content: contentEl.innerText || '[图片]'
+                        content: contentEl.innerText || '[图片/表情]'
                     });
                 } else {
                     selectedMessages.delete(messageId);
@@ -6092,8 +6245,8 @@
                 }
             });
             async function setupReply(bubbleElement) {
-                const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .image-message-content');
-                const content = contentEl.innerText || '[图片]';
+                const contentEl = bubbleElement.querySelector('.message-content, .merged-forward-message, .red-packet-bubble, .transfer-bubble, .voice-message-bubble, .described-image-bubble, .image-message-content, .sticker-message-content');
+                const content = contentEl.innerText || '[图片/表情]';
                 const turnElement = bubbleElement.closest('.message-turn');
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 const userProfile = await db.userProfile.get('main');
@@ -6416,6 +6569,7 @@
                 const contact = await db.contacts.get({contactId: currentChatContactId});
                 
                 let currentStatus = rp.status;
+                                
                 const myUserId = contact.boundMaskId || 'user';
                 const iHaveOpened = rp.openers.some(o => o.userId === myUserId);
                 
@@ -6750,6 +6904,135 @@
             }
 
 
+            // Sticker Functions
+            async function renderStickerPanel() {
+                const stickers = await db.stickers.toArray();
+                let stickerGridHTML = stickers.map(s => `
+                    <div class="sticker-item" data-sticker-name="${s.name}">
+                        <img src="${s.url}" alt="${s.name}">
+                    </div>`).join('');
+
+                if (stickers.length === 0) {
+                    stickerGridHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px 0;">你还没有添加任何表情包</p>';
+                }
+                stickerGridContainer.innerHTML = `<div class="sticker-grid">${stickerGridHTML}</div>`;
+            }
+
+            async function addStickersFromURL() {
+                const { action, values } = await showCustomModal({
+                    title: '从URL添加表情包',
+                    rawHTML: `<textarea name="text" class="modal-edit-textarea" placeholder="格式：\n文字描述 http://.../图片.gif\n(每行一个)"></textarea>`,
+                    buttons: [{id: 'cancel', text: '取消'}, {id: 'confirm', text: '添加', class: 'confirm'}]
+                });
+
+                if (action === 'confirm' && values.text.trim()) {
+                    const lines = values.text.trim().split('\n').map(l => l.trim()).filter(l => l);
+                    let count = 0;
+                    for (const line of lines) {
+                        const firstSpaceIndex = line.indexOf(' ');
+                        if (firstSpaceIndex === -1) continue;
+
+                        const name = line.substring(0, firstSpaceIndex).trim();
+                        const url = line.substring(firstSpaceIndex + 1).trim();
+
+                        if (name && url.startsWith('http')) {
+                            await db.stickers.put({ name, url });
+                            count++;
+                        }
+                    }
+                    showToast(`成功添加了 ${count} 个表情包！`);
+                    await renderStickerPanel();
+                }
+            }
+            
+            document.getElementById('sticker-add-album').addEventListener('click', () => {
+                stickerUploadInput.click();
+            });
+            document.getElementById('sticker-add-url').addEventListener('click', () => {
+                 addStickersFromURL();
+            });
+            document.getElementById('sticker-manage').addEventListener('click', (e) => {
+                 const isDeleteMode = body.classList.toggle('sticker-delete-mode');
+                 e.target.textContent = isDeleteMode ? '完成' : '管理';
+                 e.target.classList.toggle('active', isDeleteMode);
+            });
+
+
+            stickerGridContainer.addEventListener('click', async (e) => {
+                const stickerItem = e.target.closest('.sticker-item');
+                if (!stickerItem) return;
+
+                const stickerName = stickerItem.dataset.stickerName;
+                const isDeleteMode = body.classList.contains('sticker-delete-mode');
+
+                if (isDeleteMode) {
+                    const { action: confirmDelete } = await showCustomModal({
+                        title: '删除表情',
+                        message: `确定要删除表情 "${stickerName}" 吗？`,
+                        buttons: [{id: 'cancel', text: '取消'}, {id: 'confirm', text: '删除', class: 'destructive'}]
+                    });
+                    if (confirmDelete === 'confirm') {
+                        await db.stickers.where({ name: stickerName }).delete();
+                        showToast('表情已删除');
+                        await renderStickerPanel();
+                    }
+                } else {
+                    const sticker = await db.stickers.get({ name: stickerName });
+                    if (sticker) {
+                        const contact = await db.contacts.get({contactId: currentChatContactId});
+                        const senderId = contact.boundMaskId || 'user';
+                        const msg = {
+                            role: 'user', type: 'sticker', senderId,
+                            imageUrl: sticker.url, stickerName: sticker.name,
+                            messageId: `msg_${Date.now()}_${Math.random()}`, timestamp: Date.now(),
+                        };
+                        await addMessageToUI(msg);
+                        body.classList.remove('sticker-panel-visible');
+                    }
+                }
+            });
+
+            stickerUploadInput.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if (!files.length) return;
+
+                body.classList.remove('sticker-panel-visible');
+                showToast(`开始处理 ${files.length} 个表情...`);
+
+                for (const file of files) {
+                    try {
+                        const options = { maxSizeMB: 0.5, useWebWorker: true, fileType: 'image/webp' };
+                        const compressedFile = await imageCompression(file, options);
+
+                        const dataUrl = await imageCompression.getDataUrlFromFile(compressedFile);
+                        
+                        const { action, values } = await showCustomModal({
+                            title: '表情包描述',
+                            rawHTML: `<div style="text-align: center; margin-bottom: 15px;"><img src="${dataUrl}" style="max-width: 100px; max-height: 100px; border-radius: 5px;"></div><input type="text" name="name" placeholder="为这个表情输入文字描述" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px;">`,
+                            buttons: [{id: 'cancel', text: '跳过'}, {id: 'confirm', text: '保存', class: 'confirm'}]
+                        });
+                        
+                        if (action === 'confirm' && values.name.trim()) {
+                            const name = values.name.trim();
+                            const existing = await db.stickers.get({ name });
+                            if (existing) {
+                                showToast(`已存在名为 "${name}" 的表情，请换个名字`, 'warning');
+                            } else {
+                                await db.stickers.add({ name, url: dataUrl });
+                                showToast(`表情 "${name}" 已添加`);
+                            }
+                        }
+                    } catch (error) {
+                        showToast('一个表情处理失败', 'warning');
+                        console.error("Sticker processing error:", error);
+                    }
+                }
+                e.target.value = '';
+                showToast('所有表情处理完毕！');
+                await renderStickerPanel();
+            });
+
+
             // Event Listeners
             modalOverlay.addEventListener('keyup', (e) => {
                 if (e.target.matches('.financial-modal-body .amount-input')) {
@@ -6776,7 +7059,7 @@
                 }
             });
             chatHeaderTitle.addEventListener('click', () => {
-                if (body.classList.contains('chat-view-active')) {
+                if (body.classList.contains('chat-view-active') && !isMultiSelectMode) {
                     aiStatusModal.classList.add('visible');
                 }
             });
